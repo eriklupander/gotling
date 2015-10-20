@@ -1,0 +1,26 @@
+--- ### Loadtest 1
+  iterations: 20
+  users: 20
+  rampup: 10
+  actions:
+    - type: http
+      method: GET
+      url: http://127.0.0.1:8080/courses
+      accept: json # optional
+      response:
+        find: '"id":[0-9],'
+        var: courseId
+        index: random # first, random, last
+    - type: sleep
+      duration: 3
+    - type: http
+      method: GET
+      url: http://127.0.0.1:8080/courses/${courseId}
+      accept: json # optional
+    - type: sleep
+      duration: 3
+  outputs:
+    - type: websocket
+      url: http://127.0.0.1:9090/dashboard
+    - type: html
+    - type: console

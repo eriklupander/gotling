@@ -1,0 +1,17 @@
+---
+iterations: 30
+users: 20
+rampup: 10
+actions:
+  - http:
+      method: GET
+      url: http://www.google.com/robots.txt
+      accept: json
+  - sleep:
+      duration: 2
+  - http:
+      method: GET
+      url: http://www.callistaenterprise.se
+      accept: json
+  - sleep:
+        duration: 1

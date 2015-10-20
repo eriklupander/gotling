@@ -22,3 +22,8 @@ _testmain.go
 *.exe
 *.test
 *.prof
+.idea
+*.iml
+bin
+out
+pkg
