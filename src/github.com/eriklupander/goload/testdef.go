@@ -5,18 +5,18 @@ type Action struct {
 	Properties map[string]string `yaml:"properties"`
 }
 
-type Sleep struct {
+type SleepAction struct {
 	Duration int `yaml:"duration"`
 }
 
-type HttpReq struct {
+type HttpReqAction struct {
 	Method string `yaml:"method"`
 	Url string `yaml:"url"`
 	Accept string `yaml:"accept"`
 }
 
 type TestDef struct {
-	Iterations string `yaml:"iterations"`
+	Iterations int `yaml:"iterations"`
 	Users int `yaml:"users"`
 	Rampup int `yaml:"rampup"`
 	Actions []map[string]interface{} `yaml:"actions"`

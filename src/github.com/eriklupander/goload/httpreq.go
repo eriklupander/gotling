@@ -10,7 +10,7 @@ import (
 
 
 // Accepts a Httpaction and a one-way channel to write the results to.
-func DoHttpRequest(httpAction HttpReq, resultsChannel chan StatFrame, simulationStart time.Time) {
+func DoHttpRequest(httpAction HttpReqAction, resultsChannel chan HttpReqResult) {
 	req, err := http.NewRequest(httpAction.Method, httpAction.Url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -33,9 +33,10 @@ func DoHttpRequest(httpAction HttpReq, resultsChannel chan StatFrame, simulation
 		log.Fatal(err)
 	}
 	fmt.Printf("Status: %d Content-Length: %d Latency %dms %s\n", status, contentLength, elapsed/1000000, httpAction.Url)
-	statFrame := StatFrame{
-		time.Since(simulationStart).Nanoseconds(),
-		5,
+	httpReqResult := HttpReqResult {
+		elapsed.Nanoseconds(),
+		contentLength,
+		status,
 	}
-	resultsChannel <- statFrame
+	resultsChannel <- httpReqResult
 }

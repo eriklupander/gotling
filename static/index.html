@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Sample of websocket with golang</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="jquery.canvasjs.min.js"></script>
+<script>
+      $(function() {
+            var ws = new WebSocket("ws://localhost:8182/start");
+            ws.onmessage = function(e) {
+                  var statFrame = JSON.parse(e.data);
+                  updateChart(statFrame['time'], statFrame['reqs']);
+            };
+
+            var dps = []; // dataPoints
+
+            var chart = new CanvasJS.Chart("chartContainer",{
+                  title :{
+                        text: "Current req/s"
+                  },
+                  legend: {
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        fontFamily: "calibri",
+                        fontColor: "dimGrey"
+                  },
+                  axisX: {
+                        title: "Timeline 1/10 seconds"
+                  },
+                  axisY:{
+                        title: "req/s",
+                        includeZero: true
+                  },
+                  data: [{
+                        type: "line",
+                        showInLegend: true,
+                        name: "req/s",
+                        dataPoints: dps
+                  }]
+            });
+
+
+            var dataLength = 60; // number of dataPoints visible at any point
+            var updateChart = function (time, reqs) {
+
+                  dps.push({
+                        x: time,
+                        y: reqs
+                  });
+
+                  if (dps.length > dataLength) {
+                        dps.shift();
+                  }
+                  chart.render();
+            };
+
+
+            // generates first set of dataPoints
+            updateChart(dataLength);
+      });
+</script>
+</head>
+<body>
+      <div id="chartContainer" style="height: 300px; width:100%;">
+      </div>
+</body>
+</html>

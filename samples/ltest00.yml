@@ -1,6 +1,6 @@
 ---
-iterations: 30
-users: 20
+iterations: 5
+users: 3
 rampup: 10
 actions:
   - http:
