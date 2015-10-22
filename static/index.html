@@ -6,16 +6,43 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="jquery.canvasjs.min.js"></script>
 <script>
-      $(function() {
-            var ws = new WebSocket("ws://localhost:8182/start");
+      var dps = []; // dataPoints
+      var ws;
+      var dataLength = 60; // number of dataPoints visible at any point
+      var chart;
+
+      function connect() {
+            ws = new WebSocket("ws://localhost:8182/start");
             ws.onmessage = function(e) {
                   var statFrame = JSON.parse(e.data);
+                  console.log(statFrame['time'] + " " + statFrame['reqs'])
                   updateChart(statFrame['time'], statFrame['reqs']);
             };
+      }
 
-            var dps = []; // dataPoints
+      function disconnect() {
+            if (typeof ws != 'undefined')
+                  ws.close();
+      }
 
-            var chart = new CanvasJS.Chart("chartContainer",{
+      var updateChart = function (time, reqs) {
+
+            dps.push({
+                  x: time,
+                  y: reqs
+            });
+
+            if (dps.length > dataLength) {
+                  dps.shift();
+            }
+            chart.render();
+      };
+
+      $(function() {
+
+
+
+            chart = new CanvasJS.Chart("chartContainer",{
                   title :{
                         text: "Current req/s"
                   },
@@ -43,19 +70,7 @@
             });
 
 
-            var dataLength = 60; // number of dataPoints visible at any point
-            var updateChart = function (time, reqs) {
 
-                  dps.push({
-                        x: time,
-                        y: reqs
-                  });
-
-                  if (dps.length > dataLength) {
-                        dps.shift();
-                  }
-                  chart.render();
-            };
 
 
             // generates first set of dataPoints
@@ -66,5 +81,6 @@
 <body>
       <div id="chartContainer" style="height: 300px; width:100%;">
       </div>
+      <div><button onclick="connect()">Connect</button><button onclick="disconnect()">Disconnect</button></div>
 </body>
 </html>

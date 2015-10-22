@@ -34,7 +34,7 @@ func DoHttpRequest(httpAction HttpReqAction, resultsChannel chan HttpReqResult) 
 	}
 	fmt.Printf("Status: %d Content-Length: %d Latency %dms %s\n", status, contentLength, elapsed/1000000, httpAction.Url)
 	httpReqResult := HttpReqResult {
-		elapsed.Nanoseconds(),
+		elapsed.Nanoseconds()/1000000,
 		contentLength,
 		status,
 	}

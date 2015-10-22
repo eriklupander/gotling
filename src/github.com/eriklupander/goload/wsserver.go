@@ -2,7 +2,7 @@ package main
 import (
 //	"time"
 	"fmt"
-//	"encoding/json"
+	"encoding/json"
 //	"math/rand"
 //	"golang.org/x/net/websocket"
     "flag"
@@ -36,18 +36,26 @@ var upgrader = websocket.Upgrader{} // use default options
 //	fmt.Printf("Added Web Socket channel to registry, size is now %d connections", len(wsChannels))
 //}
 
+func Remove(item int) {
+    connectionRegistry = append(connectionRegistry[:item], connectionRegistry[item+1:]...)
+}
+
 func BroadcastStatFrame(statFrame StatFrame) {
-//	for _, ws := range wsChannels {
-//		serializedFrame, _  := json.Marshal(statFrame)
-//		_, err := ws.Write(serializedFrame)
-//		if err != nil {
-//			// Detected disconnected channel. Need to clean up.
-//			//panic(err)
-//            fmt.Printf("Could not write to channel: %v", err)
-//		}
-//	}
+    for index, wsConn := range connectionRegistry {
+		serializedFrame, _  := json.Marshal(statFrame)
+		err := wsConn.WriteMessage(1, serializedFrame)
+		if err != nil {
+			// Detected disconnected channel. Need to clean up.
+
+            fmt.Printf("Could not write to channel: %v", err)
+            wsConn.Close()
+            Remove(index)
+		}
+	}
 
 }
+
+var connectionRegistry = make([]*websocket.Conn, 0, 10)
 
 func echo(w http.ResponseWriter, r *http.Request) {
     if r.URL.Path != "/start" {
@@ -63,6 +71,8 @@ func echo(w http.ResponseWriter, r *http.Request) {
         log.Print("upgrade:", err)
         return
     }
+    connectionRegistry = append(connectionRegistry, c)
+    /**
     defer c.Close()
     for {
         mt, message, err := c.ReadMessage()
@@ -77,10 +87,13 @@ func echo(w http.ResponseWriter, r *http.Request) {
             break
         }
     }
+    */
 }
 
 func StartWsServer() {
-	fmt.Println("Starting WebSocket server")
+
+
+    fmt.Println("Starting WebSocket server")
     flag.Parse()
     log.SetFlags(0)
 

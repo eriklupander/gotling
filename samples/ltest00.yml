@@ -1,6 +1,6 @@
 ---
-iterations: 5
-users: 3
+iterations: 15
+users: 5
 rampup: 10
 actions:
   - http:
@@ -11,7 +11,7 @@ actions:
       duration: 2
   - http:
       method: GET
-      url: http://www.callistaenterprise.se
+      url: https://www.sunet.se/robots.txt
       accept: json
   - sleep:
         duration: 1
