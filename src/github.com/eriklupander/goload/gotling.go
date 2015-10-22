@@ -7,6 +7,7 @@ import(
     "gopkg.in/yaml.v2"
 	"time"
     "fmt"
+    "sync"
 )
 
 
@@ -38,7 +39,7 @@ func aggregatePerSecondHandler(perSecondChannel chan HttpReqResult) {
                 totalReq++
                 totalLatency += int(msg.Latency)
             default:
-
+                time.Sleep(time.Duration(10)*time.Millisecond)
             }
         }
         // concurrently assemble the result and send it off to the websocket.
@@ -90,17 +91,23 @@ func main() {
 
 	resultsChannel := make(chan HttpReqResult, 1000) // buffer?
 	go acceptResults(resultsChannel)
-
+    wg := sync.WaitGroup{}
     for i := 0; i < t.Users; i++ {
-        go runActions(t, resultsChannel)
+        wg.Add(1)
+        go runActions(&t, resultsChannel, &wg)
     }
-
     // Start the web socket server, will block exit until forced
-    StartWsServer()
+    go StartWsServer()
+
+    fmt.Println("Waiting at WaitGroup")
+    wg.Wait()
+    fmt.Println("Done!")
+
 }
 
-func runActions(t TestDef, resultsChannel chan HttpReqResult) {
+func runActions(t *TestDef, resultsChannel chan HttpReqResult, wg *sync.WaitGroup) {
     for i := 0; i < t.Iterations; i++ {
+        // TODO separate parsing of the YAML from actual execution, e.g. don't parse out stuff each time. Looks bad.
         for _, element := range t.Actions {
 
             for key, value := range element {
@@ -122,6 +129,7 @@ func runActions(t TestDef, resultsChannel chan HttpReqResult) {
             }
         }
     }
+    wg.Done()
 }
 
 

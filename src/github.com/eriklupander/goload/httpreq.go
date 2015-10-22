@@ -2,7 +2,7 @@ package main
 
 import (
 	"net/http"
-	"fmt"
+	//"fmt"
 	"log"
 	"io/ioutil"
 	"time"
@@ -32,7 +32,7 @@ func DoHttpRequest(httpAction HttpReqAction, resultsChannel chan HttpReqResult) 
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Status: %d Content-Length: %d Latency %dms %s\n", status, contentLength, elapsed/1000000, httpAction.Url)
+	//fmt.Printf("Status: %d Content-Length: %d Latency %dms %s\n", status, contentLength, elapsed/1000000, httpAction.Url)
 	httpReqResult := HttpReqResult {
 		elapsed.Nanoseconds()/1000000,
 		contentLength,
