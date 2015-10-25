@@ -1,17 +1,32 @@
 ---
-iterations: 15
-users: 5
-rampup: 10
+iterations: 1
+users: 1
+rampup: 1
 actions:
   - http:
       method: GET
-      url: http://www.google.com/robots.txt
+      url: http://localhost:8183/courses
+      accept: json
+      response:
+        jsonpath: $[*].id+
+        variable: courseId
+        index: first # first, random, last
+  - sleep:
+      duration: 3
+  - http:
+      method: GET
+      url: http://localhost:8183/courses/${courseId}
+      accept: json
+      response:
+        jsonpath: $.author+
+        variable: author
+        index: first # first, random, last
+  - sleep:
+        duration: 3
+  - http:
+      method: POST
+      url: http://localhost:8183/courses
+      body: '{"id":100,"name":"Fjällbacka","author":"${author}-${courseId}","created":"2015-10-23T21:33:38.254+02:00","baseLatitude":45.634353,"baseLongitude":11.3424324,"holes":[]}'
       accept: json
   - sleep:
       duration: 2
-  - http:
-      method: GET
-      url: https://www.sunet.se/robots.txt
-      accept: json
-  - sleep:
-        duration: 1

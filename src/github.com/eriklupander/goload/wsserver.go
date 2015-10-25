@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"encoding/json"
 //	"math/rand"
-//	"golang.org/x/net/websocket"
     "flag"
 	"net/http"
     "log"
@@ -14,27 +13,6 @@ import (
 var addr = flag.String("addr", "localhost:8182", "http service address")
 
 var upgrader = websocket.Upgrader{} // use default options
-
-//func startDataSimulation(ws *websocket.Conn) {
-
-//	for i := 0; i < 1000; i++ {
-//		var statFrame StatFrame
-//		statFrame.Time = int64(i*1000)
-//		statFrame.ReqS = (rand.Intn(20)+150)
-//		serializedFrame, err  := json.Marshal(statFrame)
-//		if err != nil {
-//			panic(err)
-//		}
-//		ws.Write(serializedFrame)
-//		fmt.Printf("sent StatFrame: %s\n", serializedFrame)
-//		time.Sleep(1000 * time.Millisecond)
-//	}
-//}
-//
-//func registerChannel(ws *websocket.Conn) {
-//	wsChannels = append(wsChannels, ws)
-//	fmt.Printf("Added Web Socket channel to registry, size is now %d connections", len(wsChannels))
-//}
 
 func Remove(item int) {
     connectionRegistry = append(connectionRegistry[:item], connectionRegistry[item+1:]...)
@@ -57,7 +35,7 @@ func BroadcastStatFrame(statFrame StatFrame) {
 
 var connectionRegistry = make([]*websocket.Conn, 0, 10)
 
-func echo(w http.ResponseWriter, r *http.Request) {
+func registerChannel(w http.ResponseWriter, r *http.Request) {
     if r.URL.Path != "/start" {
         http.Error(w, "Not found", 404)
         return
@@ -72,22 +50,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
         return
     }
     connectionRegistry = append(connectionRegistry, c)
-    /**
-    defer c.Close()
-    for {
-        mt, message, err := c.ReadMessage()
-        if err != nil {
-            log.Println("read:", err)
-            break
-        }
-        log.Printf("recv: %s", message)
-        err = c.WriteMessage(mt, message)
-        if err != nil {
-            log.Println("write:", err)
-            break
-        }
-    }
-    */
+
 }
 
 func StartWsServer() {
@@ -97,8 +60,7 @@ func StartWsServer() {
     flag.Parse()
     log.SetFlags(0)
 
-	//http.Handle("/start", websocket.Handler(registerChannel))
-    http.HandleFunc("/start", echo)
+    http.HandleFunc("/start", registerChannel)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "static/" + r.URL.Path[1:])
 	})
