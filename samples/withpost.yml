@@ -23,3 +23,10 @@ actions:
         index: first # first, random, last
   - sleep:
         duration: 3
+  - http:
+      method: POST
+      url: http://localhost:9183/courses
+      body: '{"id":100,"name":"Fjällbacka","author":"${author}-${courseId}","created":"2015-10-23T21:33:38.254+02:00","baseLatitude":45.634353,"baseLongitude":11.3424324,"holes":[]}'
+      accept: json
+  - sleep:
+      duration: 2

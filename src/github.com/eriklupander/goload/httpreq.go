@@ -2,16 +2,14 @@ package main
 
 import (
 	"net/http"
-	//"fmt"
+
 	"log"
 	"io/ioutil"
 	"time"
 	"github.com/NodePrime/jsonpath"
-//"strings"
-//	"reflect"
-"math/rand"
-"strings"
-    "fmt"
+
+     "math/rand"
+     "strings"
 )
 
 
@@ -50,7 +48,6 @@ func buildRequest(httpAction HttpReqAction, sessionMap map[string]string) *http.
     var req *http.Request
     var err error
     if httpAction.Body != "" {
-        //var reader *strings.Reader
         reader := strings.NewReader(SubstParams(sessionMap, httpAction.Body))
         req, err = http.NewRequest(httpAction.Method, SubstParams(sessionMap, httpAction.Url), reader)
     } else {
@@ -79,13 +76,13 @@ func processResult(httpAction HttpReqAction, sessionMap map[string]string, respo
         if err != nil {
             panic(err)
         }
+
+        // TODO optimization: Don't reinitialize each time, reuse this somehow.
         resultsArray := make([]string, 0, 10)
         for {
             if result, ok := eval.Next(); ok {
 
                 value := strings.TrimSpace(result.Pretty(false))
-
-                fmt.Println()
                 resultsArray = append(resultsArray, trimChar(value, '"'))
             } else {
                 break

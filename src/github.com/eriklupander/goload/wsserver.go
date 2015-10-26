@@ -54,8 +54,6 @@ func registerChannel(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartWsServer() {
-
-
     fmt.Println("Starting WebSocket server")
     flag.Parse()
     log.SetFlags(0)

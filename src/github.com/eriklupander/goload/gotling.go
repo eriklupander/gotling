@@ -11,12 +11,17 @@ import(
    // "reflect"
     "reflect"
     "gopkg.in/yaml.v2"
+
+    "github.com/davecheney/profile"
 )
 
 
 var SimulationStart time.Time
 
+
 func main() {
+
+    defer profile.Start(profile.CPUProfile).Stop()
 
     // Start the web socket server, will not block exit until forced
     go StartWsServer()
@@ -36,12 +41,11 @@ func main() {
 }
 
 func spawnUsers(t *TestDef, actions []interface{}) {
-    resultsChannel := make(chan HttpReqResult, 1000) // buffer?
+    resultsChannel := make(chan HttpReqResult) // buffer?
     go acceptResults(resultsChannel)
     wg := sync.WaitGroup{}
     for i := 0; i < t.Users; i++ {
         wg.Add(1)
-        //go runActions(&t, resultsChannel, &wg)
         go launchActions(t, resultsChannel, &wg, actions)
         var waitDuration float32 = float32(t.Rampup) / float32(t.Users)
         time.Sleep( time.Duration( int(1000*waitDuration) )*time.Millisecond)
@@ -51,17 +55,16 @@ func spawnUsers(t *TestDef, actions []interface{}) {
 }
 
 func launchActions(t *TestDef, resultsChannel chan HttpReqResult, wg *sync.WaitGroup, actions []interface{}) {
-
+    var sessionMap = make(map[string]string)
     for i := 0; i < t.Iterations; i++ {
 
-        var sessionMap = make(map[string]string)
+        // Optimization? Delete all entries rather than reallocate map from scratch.
+        for k := range sessionMap {
+            delete(sessionMap, k)
+        }
 
         for _, action := range actions {
 
-            if action != nil {
-                // Just to test..
-                action.(Action).Execute()
-            }
             // TODO introduce an "execute()" interface function as implicit interface. Let the execution code be
             // encapsulated by the Action OO-style.
             actionType := fmt.Sprintf("%s", reflect.TypeOf(action))
@@ -124,47 +127,6 @@ func getBody(action map[interface{}]interface{}) string {
     }
     return body
 }
-
-//func runActions(t *TestDef, resultsChannel chan HttpReqResult, wg *sync.WaitGroup) {
-//    for i := 0; i < t.Iterations; i++ {
-//        // TODO separate parsing of the YAML from actual execution, e.g. don't parse out stuff each time. Looks bad.
-//
-//        for _, element := range t.Actions {
-//
-//            for key, value := range element {
-//
-//                switch key {
-//                case "sleep":
-//                    action := value.(map[interface{}]interface{})
-//
-//                    duration := action["duration"].(int)
-//                    time.Sleep(time.Duration(duration) * time.Second)
-//                    break
-//                case "http":
-//                    action := value.(map[interface{}]interface{})
-//                    var responseHandler HttpResponseHandler
-//                    if action["response"] != nil {
-//                        response := action["response"].(map[interface{}]interface{})
-//                        responseHandler.Jsonpath = response["jsonpath"].(string)
-//                        responseHandler.Variable = response["variable"].(string)
-//                        responseHandler.Index = response["index"].(string)
-//                    }
-//                    url := strings.TrimSpace(substParams(sessionMap, action["url"].(string)))
-//                    var body string = ""
-//                    if action["body"] != nil {
-//                        body = action["body"].(string)
-//                    }
-//                    httpReq := HttpReqAction{action["method"].(string), url, substParams(sessionMap, body), action["accept"].(string), responseHandler}
-//                    DoHttpRequest(httpReq, resultsChannel, sessionMap)
-//                    break
-//                }
-//            }
-//        }
-//    }
-//    wg.Done()
-//}
-
-
 
 /**
  * Loops indefinitely. The inner loop runs for exactly one second before submitting its
