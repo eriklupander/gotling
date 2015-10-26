@@ -10,11 +10,12 @@ import (
 
      "math/rand"
      "strings"
+	"github.com/eriklupander/goload/model"
 )
 
 
 // Accepts a Httpaction and a one-way channel to write the results to.
-func DoHttpRequest(httpAction HttpReqAction, resultsChannel chan HttpReqResult, sessionMap map[string]string) {
+func DoHttpRequest(httpAction HttpAction, resultsChannel chan model.HttpReqResult, sessionMap map[string]string) {
 
     req := buildRequest(httpAction, sessionMap)
 	client := &http.Client{}
@@ -35,7 +36,7 @@ func DoHttpRequest(httpAction HttpReqAction, resultsChannel chan HttpReqResult, 
 	if err != nil {
 		log.Fatal(err)
 	}
-	httpReqResult := HttpReqResult {
+	httpReqResult := model.HttpReqResult {
 		elapsed.Nanoseconds()/1000000,
 		contentLength,
 		status,
@@ -44,7 +45,7 @@ func DoHttpRequest(httpAction HttpReqAction, resultsChannel chan HttpReqResult, 
 }
 
 
-func buildRequest(httpAction HttpReqAction, sessionMap map[string]string) *http.Request {
+func buildRequest(httpAction HttpAction, sessionMap map[string]string) *http.Request {
     var req *http.Request
     var err error
     if httpAction.Body != "" {
@@ -66,7 +67,7 @@ func buildRequest(httpAction HttpReqAction, sessionMap map[string]string) *http.
  *
  * Uses github.com/NodePrime/jsonpath
  */
-func processResult(httpAction HttpReqAction, sessionMap map[string]string, responseBody []byte) {
+func processResult(httpAction HttpAction, sessionMap map[string]string, responseBody []byte) {
     if httpAction.ResponseHandler.Jsonpath != "" {
         paths, err := jsonpath.ParsePaths(httpAction.ResponseHandler.Jsonpath)
         if err != nil {
@@ -96,13 +97,13 @@ func processResult(httpAction HttpReqAction, sessionMap map[string]string, respo
 
         if resultCount > 0 {
             switch httpAction.ResponseHandler.Index {
-            case FIRST:
+            case model.FIRST:
                 sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
                 break
-            case LAST:
+            case model.LAST:
                 sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[resultCount-1]
                 break
-            case RANDOM:
+            case model.RANDOM:
                 if resultCount > 1 {
                     sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount - 1)]
                 } else {
