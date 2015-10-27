@@ -8,7 +8,7 @@ import (
  * Loops indefinitely. The inner loop runs for exactly one second before submitting its
  * results to the WebSocket handler, then the aggregates are reset and restarted.
  */
-func aggregatePerSecondHandler(perSecondChannel chan model.HttpReqResult) {
+func aggregatePerSecondHandler(perSecondChannel chan *model.HttpReqResult) {
 
 	for {
 
@@ -19,7 +19,7 @@ func aggregatePerSecondHandler(perSecondChannel chan model.HttpReqResult) {
 			select {
 			case msg := <-perSecondChannel:
 				totalReq++
-				totalLatency += int(msg.Latency)
+				totalLatency += int(msg.Latency/1000) // measure in microseconds
 			default:
 			// Can be trouble. Uses too much CPU if low, limits throughput if too high
 				time.Sleep(100*time.Microsecond)
@@ -37,8 +37,8 @@ func assembleAndSendResult(totalReq int, totalLatency int) {
 		avgLatency = totalLatency / totalReq
 	}
 	statFrame := StatFrame {
-		time.Since(SimulationStart).Nanoseconds() / 100000000,
-		avgLatency,
+		time.Since(SimulationStart).Nanoseconds() / 1000000000, // seconds
+		avgLatency,                                             // microseconds
 		totalReq,
 	}
 	BroadcastStatFrame(statFrame)
@@ -48,12 +48,13 @@ func assembleAndSendResult(totalReq int, totalLatency int) {
  * Starts the per second aggregator and then forwards any HttpRequestResult messages to it through the channel.
  */
 func acceptResults(resChannel chan model.HttpReqResult) {
-	perSecondAggregatorChannel := make(chan model.HttpReqResult, 5)
+	perSecondAggregatorChannel := make(chan *model.HttpReqResult, 5)
 	go aggregatePerSecondHandler(perSecondAggregatorChannel)
 	for {
 		select {
 		case msg := <-resChannel:
-			perSecondAggregatorChannel <- msg
+			perSecondAggregatorChannel <- &msg
+			writeResult(&msg) // sync write result to file for later processing.
 		default:
 		// This is troublesome. If too high, throughput is bad. Too low, CPU use goes up too much
 			time.Sleep(100 * time.Microsecond)

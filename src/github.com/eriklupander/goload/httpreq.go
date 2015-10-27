@@ -37,9 +37,11 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan model.HttpReqResul
 		log.Fatal(err)
 	}
 	httpReqResult := model.HttpReqResult {
-		elapsed.Nanoseconds()/1000000,
+		elapsed.Nanoseconds(),
 		contentLength,
 		status,
+        httpAction.Title,
+        time.Since(SimulationStart).Nanoseconds(),
 	}
 	resultsChannel <- httpReqResult
 }

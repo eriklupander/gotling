@@ -25,6 +25,7 @@ func buildActionList(t *model.TestDef) []interface{} {
 					action["url"].(string),
 					getBody(action),
 					action["accept"].(string),
+					action["title"].(string),
 					responseHandler,
 				})
 

@@ -31,10 +31,13 @@ func main() {
     yaml.Unmarshal([]byte(dat), &t)
 
     actions := buildActionList(&t)
+    OpenResultsFile(dir + "/results/log/" + string(SimulationStart.UnixNano()) + ".log" )
 	spawnUsers(&t, actions)
 
     fmt.Printf("Done in %v\n", time.Since(SimulationStart))
-
+    fmt.Println("Building reports, please wait...")
+    CloseResultsFile()
+    //buildReport()
 }
 
 func spawnUsers(t *model.TestDef, actions []interface{}) {
@@ -55,7 +58,7 @@ func launchActions(t *model.TestDef, resultsChannel chan model.HttpReqResult, wg
     var sessionMap = make(map[string]string)
     for i := 0; i < t.Iterations; i++ {
 
-        // Optimization? Delete all entries rather than reallocate map from scratch.
+        // Optimization? Delete all entries rather than reallocate map from scratch for each new iteration.
         for k := range sessionMap {
             delete(sessionMap, k)
         }
@@ -65,22 +68,6 @@ func launchActions(t *model.TestDef, resultsChannel chan model.HttpReqResult, wg
 			if action != nil {
 				action.(model.Action).Execute(resultsChannel, sessionMap)
 			}
-//            // TODO introduce an "execute()" interface function as implicit interface. Let the execution code be
-//            // encapsulated by the Action OO-style.
-//            actionType := fmt.Sprintf("%s", reflect.TypeOf(action))
-//            switch actionType {
-//            case "main.HttpReqAction":
-//                httpReqAction := action.(HttpReqAction)
-//                DoHttpRequest(httpReqAction, resultsChannel, sessionMap)
-//
-//                break
-//            case "main.SleepAction":
-//                sleepAction := action.(SleepAction)
-//                time.Sleep(time.Duration(sleepAction.Duration) * time.Second)
-//                break
-//            default:
-//                break
-//            }
         }
     }
     wg.Done()

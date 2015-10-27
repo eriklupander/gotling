@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Sample of websocket with golang</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="jquery.canvasjs.min.js"></script>
+<script>
+      var dps = [], dps2 = []; // dataPoints
+      var ws;
+      var dataLength = 60; // number of dataPoints visible at any point
+      var reqPerSecondChart;
+
+      function connect() {
+            ws = new WebSocket("ws://localhost:8182/start");
+            ws.onmessage = function(e) {
+                  var statFrame = JSON.parse(e.data);
+                  console.log(statFrame['time'] + " " + statFrame['reqs'], statFrame['latency'])
+                  updateChart(statFrame['time'], statFrame['reqs'], statFrame['latency']);
+            };
+      }
+
+      function disconnect() {
+            if (typeof ws != 'undefined')
+                  ws.close();
+      }
+
+      var updateChart = function (time, reqs, latency) {
+
+            dps.push({
+                  x: time,
+                  y: reqs
+            });
+            dps2.push({
+                  x: time,
+                  y: latency
+            });
+
+            if (dps.length > dataLength) {
+                  dps.shift();
+            }
+            if (dps2.length > dataLength) {
+                  dps2.shift();
+            }
+            reqPerSecondChart.render();
+      };
+
+      $(function() {
+
+
+
+            reqPerSecondChart = new CanvasJS.Chart("chartContainer",{
+                  title :{
+                        text: "Current req/s"
+                  },
+                  legend: {
+                        verticalAlign: "top",
+                        horizontalAlign: "center",
+                        fontSize: 14,
+                        fontWeight: "bold",
+                        fontFamily: "calibri",
+                        fontColor: "dimGrey"
+                  },
+                  axisX: {
+                        title: "Timeline seconds"
+                  },
+                  axisY:{
+                        title: "req/s",
+                        includeZero: true
+                  },
+                  data: [{
+                        type: "line",
+                        showInLegend: true,
+                        name: "req/s",
+                        dataPoints: dps
+                  }, {
+                        type: "line",
+                        showInLegend: true,
+                        name: "latency",
+                        dataPoints: dps2
+                  }]
+            });
+
+
+
+
+
+            // generates first set of dataPoints
+            updateChart(dataLength);
+      });
+</script>
+</head>
+<body>
+      <div id="chartContainer" style="height: 300px; width:100%;">
+      </div>
+      <div><button onclick="connect()">Connect</button><button onclick="disconnect()">Disconnect</button></div>
+</body>
+</html>

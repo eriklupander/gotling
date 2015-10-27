@@ -1,6 +1,5 @@
 package main
 import (
-	"fmt"
 	"github.com/eriklupander/goload/model"
 )
 
@@ -9,11 +8,12 @@ type HttpAction struct {
 	Url string `yaml:"url"`
 	Body string `yaml:"body"`
 	Accept string `yaml:"accept"`
+	Title string `yaml:"title"`
 	ResponseHandler HttpResponseHandler `yaml:"response"`
 }
 
 func (h HttpAction) Execute(resultsChannel chan model.HttpReqResult, sessionMap map[string]string) {
-	fmt.Println("HttpReqAction")
+
 	DoHttpRequest(h, resultsChannel, sessionMap)
 }
 
