@@ -30,7 +30,17 @@ func main() {
     var t model.TestDef
     yaml.Unmarshal([]byte(dat), &t)
 
+    if !ValidateTestDefinition(&t) {
+        return
+    }
+
+    if t.Feeder.Type == "csv" {
+         Csv(t.Feeder.Filename)
+    }
     actions := buildActionList(&t)
+
+
+
     OpenResultsFile(dir + "/results/log/" + string(SimulationStart.UnixNano()) + ".log" )
 	spawnUsers(&t, actions)
 
@@ -61,6 +71,16 @@ func launchActions(t *model.TestDef, resultsChannel chan model.HttpReqResult, wg
         // Optimization? Delete all entries rather than reallocate map from scratch for each new iteration.
         for k := range sessionMap {
             delete(sessionMap, k)
+        }
+
+        // If we have feeder data, pop an item and push its key-value pairs into the sessionMap
+        if t.Feeder.Type != "" {
+            feedData := Next()  // FEL, får samma data två gånger, en per goroutine...
+            fmt.Printf("Feed data: %v\n", feedData)
+            for item := range feedData {
+                sessionMap[item] = feedData[item]
+            }
+            fmt.Printf("Current sessionMap: %v\n", sessionMap)
         }
 
         for _, action := range actions {
