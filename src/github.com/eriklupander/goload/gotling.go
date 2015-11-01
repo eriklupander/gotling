@@ -75,12 +75,11 @@ func launchActions(t *model.TestDef, resultsChannel chan model.HttpReqResult, wg
 
         // If we have feeder data, pop an item and push its key-value pairs into the sessionMap
         if t.Feeder.Type != "" {
-            feedData := Next()  // FEL, får samma data två gånger, en per goroutine...
-            fmt.Printf("Feed data: %v\n", feedData)
+            go Next()  // FEL, får samma data två gånger, en per goroutine...
+            feedData := <- Outchan
             for item := range feedData {
                 sessionMap[item] = feedData[item]
             }
-            fmt.Printf("Current sessionMap: %v\n", sessionMap)
         }
 
         for _, action := range actions {
