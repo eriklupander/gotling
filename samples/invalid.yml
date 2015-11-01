@@ -1,7 +1,7 @@
 ---
-iterations: 5
-users: 100
-rampup: 10
+iterations: 1
+users: 1
+rampup: 0
 feeder:
   type: csv #csv, json
   filename: testdata.csv
@@ -30,6 +30,3 @@ actions:
         index: first # first, random, last
   - sleep:
         duration: 3
-  - tcp:
-      address: 127.0.0.1:8081
-      payload: ACT|LOGIN|${personNr}|${namn}\n

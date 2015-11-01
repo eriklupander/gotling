@@ -5,28 +5,39 @@ import (
     "fmt"
     "log"
     "strings"
+    "sync"
 )
 
 var data []map[string]string
 var index = 0
 
-var Outchan chan map[string]string
+var l sync.Mutex
 
-func Next() {
+// "public" synchronized channel for delivering feeder data
+var FeedChannel chan map[string]string
+
+//
+func NextFromFeeder() {
+
     if data != nil && len(data) > 0 {
-        Outchan <- data[index]
+
+        // Push data into the FeedChannel
+       // fmt.Printf("Current index: %d of total size: %d\n", index, len(data))
+        FeedChannel <- data[index]
 
         // Cycle, does this need to be synchronized?
-        if index < len(data) {
+        l.Lock()
+        if index < len(data) - 1 {
             index += 1
         } else {
             index = 0
         }
+        l.Unlock()
     }
 
 }
 
-func Csv(filename string) {
+func Csv(filename string, separator string) {
     dir, _ := os.Getwd()
     file, _ := os.Open(dir + "/data/" + filename)
 
@@ -35,16 +46,15 @@ func Csv(filename string) {
 
     data = make([]map[string]string, 0, 0)
 
+    // Scan the first line, should contain headers.
     scanner.Scan()
+    headers := strings.Split(scanner.Text(), separator)
 
-    headers := strings.Split(scanner.Text(), ",")
     for scanner.Scan() {
-        line := strings.Split(scanner.Text(), ",")
+        line := strings.Split(scanner.Text(), separator)
         item := make(map[string]string)
         for n := 0; n < len(headers); n++ {
-
             item[headers[n]] = line[n]
-
         }
         data = append(data, item)
         lines+=1
@@ -55,5 +65,5 @@ func Csv(filename string) {
     }
     index = 0
     fmt.Printf("CSV feeder fed with %d lines of data\n", lines)
-    Outchan = make(chan map[string]string)
+    FeedChannel = make(chan map[string]string)
 }

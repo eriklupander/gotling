@@ -5,7 +5,6 @@ import (
 	"net/url"
 )
 
-// Move this to some utility file
 var re = regexp.MustCompile("\\$\\{([a-zA-Z0-9]{0,})\\}")
 
 func SubstParams(sessionMap map[string]string, textData string) string {

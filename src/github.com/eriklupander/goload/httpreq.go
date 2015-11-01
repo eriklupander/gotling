@@ -11,7 +11,6 @@ import (
      "math/rand"
      "strings"
 	"github.com/eriklupander/goload/model"
-    "fmt"
 )
 
 
@@ -72,7 +71,6 @@ func buildRequest(httpAction HttpAction, sessionMap map[string]string) *http.Req
  * Uses github.com/NodePrime/jsonpath
  */
 func processResult(httpAction HttpAction, sessionMap map[string]string, responseBody []byte) {
-    fmt.Printf("BODY: %s", string(responseBody))
     if httpAction.ResponseHandler.Jsonpath != "" {
         paths, err := jsonpath.ParsePaths(httpAction.ResponseHandler.Jsonpath)
         if err != nil {

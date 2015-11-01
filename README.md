@@ -4,11 +4,15 @@ Simple golang-based load test application using YAML documents as specification.
 _Please note that this is my very first golang program and is probably full of anti-patterns and bad use of golang constructs._
 
 ## What it does
-- Provides high-throughput load testing of HTTP services 
-- Supports GET, POST, PUT and DELETE
-- Live metrics using HTML5 canvas from canvasjs
-- Request URLs and bodies can contain ${paramName} parameters
-- ${paramName} values can be extracted from HTTP response bodies and bound to a User context
+- Provides high-throughput load testing of HTTP services
+    - Supports GET, POST, PUT and DELETE
+    - Live metrics using HTML5 canvas from canvasjs
+    - Request URLs and bodies can contain ${paramName} parameters
+    - ${paramName} values can be extracted from HTTP response bodies and bound to a User context
+- TCP sockets
+    - Can send line-terminated text strings
+    - Possible to use ${varname} variables in payload
+    - Does not currently support body parsing or variable extraction from TCP response data.
 
 ## Usage
 Define your test setup in a .yml file
@@ -39,6 +43,24 @@ Define your test setup in a .yml file
             index: first
       - sleep:
             duration: 3
+      - tcp:
+            address: 127.0.0.1:8081                     # TCP socket connection
+            payload: |TYPE|1|${UID}|${email}            # Sample data using parameter substitution
+
+### Feeders and user context
+Gotling currently support CSV feeds of data. First line needs to be comma-separated headers with the following lines containing data, e.g:
+
+    id,name,size
+    1,Bear,Large
+    2,Cat,Small
+    3,Deer,Medium
+    
+These values can be accessed through ${varname} matching the column header.
+
+#### The UID
+Each "user" gets a unique "UID" assigned to it, typically an integer from 10000 + random(no of users). Perhaps I can tweak this to either use UUID's or configurable intervals. Anyway, the UID can be used using ${UID} and can be useful for grouping data etc.
+
+
 
 ## Realtime dashboard
 Access at http://localhost:8182
@@ -51,7 +73,7 @@ Click "connect" to connect to the currently executing test.
 - gopkg.in/yaml.v2
 - NodePrime/jsonpath - https://github.com/NodePrime/jsonpath/blob/master/README.md
 - gorilla/websocket
-- canvasjs
+- highcharts
 
 ## License
 Licensed under the MIT license.

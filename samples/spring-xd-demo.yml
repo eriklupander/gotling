@@ -1,0 +1,21 @@
+---
+iterations: 50
+users: 200
+rampup: 30
+feeder:
+  type: csv #csv, json
+  filename: fleetdata.csv
+actions:
+  - sleep:
+      duration: 1
+  - http:
+      title: Submit data
+      method: POST
+      url: http://localhost:10000
+      accept: json
+      body: '{"vehicleid":${UID},"lat":${lat},"lon":${lon}}'
+  - sleep:
+      duration: 1
+  - tcp:
+      address: 127.0.0.1:8081
+      payload: VEHICLE|DATAPOINT|${UID}|${dp1}|${dp2}|${dp3}|${dp4}|${dp5}

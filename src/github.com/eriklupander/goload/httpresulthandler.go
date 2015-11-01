@@ -2,6 +2,7 @@ package main
 import (
 	"time"
 	"github.com/eriklupander/goload/model"
+	"fmt"
 )
 
 /**
@@ -41,6 +42,7 @@ func assembleAndSendResult(totalReq int, totalLatency int) {
 		avgLatency,                                             // microseconds
 		totalReq,
 	}
+	fmt.Printf("Time: %d Avg latency: %d μs req/s: %d\n", statFrame.Time, statFrame.Latency, statFrame.Reqs)
 	BroadcastStatFrame(statFrame)
 }
 
