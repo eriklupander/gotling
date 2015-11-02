@@ -46,7 +46,7 @@ func main() {
         Csv(t.Feeder.Filename, ",")
     }
 
-    OpenResultsFile(dir + "/results/log/" + string(SimulationStart.UnixNano()) + ".log" )
+    OpenResultsFile(dir + "/results/log/latest.log" )
 	spawnUsers(&t, actions)
 
     fmt.Printf("Done in %v\n", time.Since(SimulationStart))

@@ -39,6 +39,7 @@ func writeResult(httpResult *model.HttpReqResult) {
         panic(err)
     }
     _, err = w.WriteString(string(jsonString))
+    _, err = w.WriteString("\n")
 
     if err != nil {
         panic(err)
