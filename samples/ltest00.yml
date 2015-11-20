@@ -1,13 +1,8 @@
 ---
-iterations: 5
-users: 100
-rampup: 10
-feeder:
-  type: csv #csv, json
-  filename: testdata.csv
+iterations: 8
+users: 2000
+rampup: 20
 actions:
-  - sleep:
-      duration: 1
   - http:
       title: Get all courses
       method: GET
@@ -24,12 +19,5 @@ actions:
       method: GET
       url: http://localhost:9183/courses/${courseId}
       accept: json
-      response:
-        jsonpath: $.author+
-        variable: author
-        index: first # first, random, last
   - sleep:
         duration: 3
-  - tcp:
-      address: 127.0.0.1:8081
-      payload: ACT|LOGIN|${personNr}|${namn}\n

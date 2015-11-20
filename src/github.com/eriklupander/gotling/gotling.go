@@ -1,0 +1,131 @@
+package main
+
+import(
+    "io/ioutil"
+    "os"
+	"time"
+    "fmt"
+    "sync"
+    //"github.com/davecheney/profile"
+
+    "math/rand"
+    "strconv"
+    "gopkg.in/yaml.v2"
+)
+
+
+var SimulationStart time.Time
+
+
+func main() {
+
+    spec := parseSpecFile()
+
+   // defer profile.Start(profile.CPUProfile).Stop()
+
+    // Start the web socket server, will not block exit until forced
+    go StartWsServer()
+
+    SimulationStart = time.Now()
+    dir, _ := os.Getwd()
+    dat, _ := ioutil.ReadFile(dir + "/" + spec)
+
+    var t TestDef
+    yaml.Unmarshal([]byte(dat), &t)
+
+    if !ValidateTestDefinition(&t) {
+        return
+    }
+
+
+    actions, isValid := buildActionList(&t)
+    if !isValid {
+        return
+    }
+
+    if t.Feeder.Type == "csv" {
+        Csv(t.Feeder.Filename, ",")
+    }
+
+    OpenResultsFile(dir + "/results/log/latest.log" )
+	spawnUsers(&t, actions)
+
+    fmt.Printf("Done in %v\n", time.Since(SimulationStart))
+    fmt.Println("Building reports, please wait...")
+    CloseResultsFile()
+    //buildReport()
+}
+
+func parseSpecFile() (string) {
+    if len(os.Args) == 1 {
+        fmt.Errorf("No command line arguments, exiting...\n")
+        panic("Cannot start simulation, no YAML simulaton specification supplied as command-line argument")
+    }
+    var s, sep string
+    for i := 1; i < len(os.Args); i++ {
+        s += sep + os.Args[i]
+        sep = " "
+    }
+    if s == "" {
+        panic(fmt.Sprintf("Specified simulation file '%s' is not a .yml file", s))
+    }
+    return s
+}
+
+func spawnUsers(t *TestDef, actions []Action) {
+    resultsChannel := make(chan HttpReqResult, 10000) // buffer?
+    go acceptResults(resultsChannel)
+    wg := sync.WaitGroup{}
+    for i := 0; i < t.Users; i++ {
+        wg.Add(1)
+        UID := strconv.Itoa(rand.Intn(t.Users+1) + 10000)
+        go launchActions(t, resultsChannel, &wg, actions, UID)
+        var waitDuration float32 = float32(t.Rampup) / float32(t.Users)
+        time.Sleep( time.Duration( int(1000*waitDuration) )*time.Millisecond)
+    }
+    fmt.Println("All users started, waiting at WaitGroup")
+    wg.Wait()
+}
+
+func launchActions(t *TestDef, resultsChannel chan HttpReqResult, wg *sync.WaitGroup, actions []Action, UID string) {
+    var sessionMap = make(map[string]string)
+
+    for i := 0; i < t.Iterations; i++ {
+
+        // Make sure the sessionMap is cleared before each iteration - except for the UID which stays
+        cleanSessionMapAndResetUID(UID, sessionMap)
+
+        // If we have feeder data, pop an item and push its key-value pairs into the sessionMap
+        feedSession(t, sessionMap)
+
+        // Iterate over the actions. Note the
+        for _, action := range actions {
+			if action != nil {
+				action.(Action).Execute(resultsChannel, sessionMap)
+			}
+        }
+    }
+    wg.Done()
+}
+
+func cleanSessionMapAndResetUID(UID string, sessionMap map[string]string) {
+    // Optimization? Delete all entries rather than reallocate map from scratch for each new iteration.
+    for k := range sessionMap {
+        delete(sessionMap, k)
+    }
+    sessionMap["UID"] = UID
+}
+
+func feedSession(t *TestDef, sessionMap map[string]string) {
+    if t.Feeder.Type != "" {
+        go NextFromFeeder() // Do async
+        feedData := <- FeedChannel // Will block here until feeder delivers value over the FeedChannel
+        for item := range feedData {
+            sessionMap[item] = feedData[item]
+        }
+    }
+}
+
+
+
+

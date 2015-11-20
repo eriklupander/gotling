@@ -1,14 +1,11 @@
 package main
-import (
-	"github.com/eriklupander/goload/model"
-)
 
 type TcpAction struct {
 	Address string `yaml:"address"`
 	Payload string `yaml:"payload"`
 }
 
-func (t TcpAction) Execute(resultsChannel chan model.HttpReqResult, sessionMap map[string]string) {
+func (t TcpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
 	DoTcpRequest(t, resultsChannel, sessionMap)
 }
 

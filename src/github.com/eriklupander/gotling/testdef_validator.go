@@ -1,12 +1,12 @@
 package main
 import (
     "log"
-    "github.com/eriklupander/goload/model"
+
 )
 
 // TODO refactor this so it runs before parsing the actions
 
-func ValidateTestDefinition(t *model.TestDef) (bool) {
+func ValidateTestDefinition(t *TestDef) (bool) {
     var valid bool = true
     if t.Iterations == 0 {
         log.Println("Iterations not set, must be > 0")

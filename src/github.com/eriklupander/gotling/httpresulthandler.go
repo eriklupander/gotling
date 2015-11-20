@@ -1,7 +1,6 @@
 package main
 import (
 	"time"
-	"github.com/eriklupander/goload/model"
 	"fmt"
 )
 
@@ -9,7 +8,7 @@ import (
  * Loops indefinitely. The inner loop runs for exactly one second before submitting its
  * results to the WebSocket handler, then the aggregates are reset and restarted.
  */
-func aggregatePerSecondHandler(perSecondChannel chan *model.HttpReqResult) {
+func aggregatePerSecondHandler(perSecondChannel chan *HttpReqResult) {
 
 	for {
 
@@ -49,17 +48,19 @@ func assembleAndSendResult(totalReq int, totalLatency int) {
 /**
  * Starts the per second aggregator and then forwards any HttpRequestResult messages to it through the channel.
  */
-func acceptResults(resChannel chan model.HttpReqResult) {
-	perSecondAggregatorChannel := make(chan *model.HttpReqResult, 5)
+func acceptResults(resChannel chan HttpReqResult) {
+	perSecondAggregatorChannel := make(chan *HttpReqResult, 5)
 	go aggregatePerSecondHandler(perSecondAggregatorChannel)
 	for {
 		select {
 		case msg := <-resChannel:
 			perSecondAggregatorChannel <- &msg
 			writeResult(&msg) // sync write result to file for later processing.
-		default:
-		// This is troublesome. If too high, throughput is bad. Too low, CPU use goes up too much
-			time.Sleep(100 * time.Microsecond)
+		case <-	time.After(100 * time.Microsecond):
+//		default:
+//			// This is troublesome. If too high, throughput is bad. Too low, CPU use goes up too much
+//			// Using a sync channel kills performance
+//			time.Sleep(100 * time.Microsecond)
 		}
 	}
 }

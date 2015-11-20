@@ -1,19 +1,18 @@
 package main
 import (
-	"github.com/eriklupander/goload/model"
 	"log"
 )
 
-func buildActionList(t *model.TestDef) ([]interface{}, bool) {
+func buildActionList(t *TestDef) ([]Action, bool) {
 	var valid bool = true
-	actions := make([]interface{}, len(t.Actions), len(t.Actions))
+	actions := make([]Action, len(t.Actions), len(t.Actions))
 	for _, element := range t.Actions {
 		for key, value := range element {
             actionMap := value.(map[interface{}]interface{})
 			switch key {
 				case "sleep":
 
-					sleepAction := model.NewSleepAction(actionMap)
+					sleepAction := NewSleepAction(actionMap)
 
 					actions = append(actions, sleepAction)
 					break

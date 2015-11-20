@@ -1,4 +1,4 @@
-package model
+package main
 
 const FIRST = "first"
 const LAST = "last"

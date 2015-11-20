@@ -2,7 +2,6 @@ package main
 import (
     "os"
     "bufio"
-    "github.com/eriklupander/goload/model"
     "encoding/json"
 )
 
@@ -23,23 +22,25 @@ func OpenResultsFile(fileName string) {
         panic(err)
     }
     w = bufio.NewWriter(f)
+    _, err = w.WriteString(string("var logdata = '"))
 }
 
 func CloseResultsFile() {
     if opened {
+        _, err = w.WriteString(string("';"))
         w.Flush()
         f.Close()
     }
     // Do nothing if not opened
 }
 
-func writeResult(httpResult *model.HttpReqResult) {
+func writeResult(httpResult *HttpReqResult) {
     jsonString, err := json.Marshal(httpResult)
     if err != nil {
         panic(err)
     }
     _, err = w.WriteString(string(jsonString))
-    _, err = w.WriteString("\n")
+    _, err = w.WriteString("|")
 
     if err != nil {
         panic(err)

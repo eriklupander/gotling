@@ -23,14 +23,13 @@ func BroadcastStatFrame(statFrame StatFrame) {
 		serializedFrame, _  := json.Marshal(statFrame)
 		err := wsConn.WriteMessage(1, serializedFrame)
 		if err != nil {
-			// Detected disconnected channel. Need to clean up.
 
+			// Detected disconnected channel. Need to clean up.
             fmt.Printf("Could not write to channel: %v", err)
             wsConn.Close()
             Remove(index)
 		}
 	}
-
 }
 
 var connectionRegistry = make([]*websocket.Conn, 0, 10)

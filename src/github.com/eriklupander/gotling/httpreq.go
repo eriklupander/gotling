@@ -2,22 +2,19 @@ package main
 
 import (
 	"net/http"
-
 	"log"
 	"io/ioutil"
 	"time"
 	"github.com/NodePrime/jsonpath"
-
      "math/rand"
      "strings"
-	"github.com/eriklupander/goload/model"
 )
 
 
 // Accepts a Httpaction and a one-way channel to write the results to.
-func DoHttpRequest(httpAction HttpAction, resultsChannel chan model.HttpReqResult, sessionMap map[string]string) {
+func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, sessionMap map[string]string) {
 
-    req := buildRequest(httpAction, sessionMap)
+    req := buildHttpRequest(httpAction, sessionMap)
 	client := &http.Client{}
 	start := time.Now()
 	resp, err := client.Do(req)
@@ -26,28 +23,33 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan model.HttpReqResul
 	}
 	elapsed := time.Since(start)
 	responseBody, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        log.Fatal(err)
+    }
 
+    defer resp.Body.Close()
 	// if action specifies response action, parse using regexp/jsonpath
     processResult(httpAction, sessionMap, responseBody)
 
-	contentLength := len(responseBody)
-	status := resp.StatusCode
-	defer resp.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	httpReqResult := model.HttpReqResult {
-		elapsed.Nanoseconds(),
-		contentLength,
-		status,
-        httpAction.Title,
-        time.Since(SimulationStart).Nanoseconds(),
-	}
+    httpReqResult := buildHttpResult(len(responseBody), resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+
 	resultsChannel <- httpReqResult
 }
 
+func buildHttpResult(contentLength int, status int, elapsed int64, title string) (HttpReqResult){
+    httpReqResult := HttpReqResult {
+        "HTTP",
+        elapsed,
+        contentLength,
+        status,
+        title,
+        time.Since(SimulationStart).Nanoseconds(),
+    }
+    return httpReqResult
+}
 
-func buildRequest(httpAction HttpAction, sessionMap map[string]string) *http.Request {
+
+func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http.Request {
     var req *http.Request
     var err error
     if httpAction.Body != "" {
@@ -100,13 +102,13 @@ func processResult(httpAction HttpAction, sessionMap map[string]string, response
 
         if resultCount > 0 {
             switch httpAction.ResponseHandler.Index {
-            case model.FIRST:
+            case FIRST:
                 sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
                 break
-            case model.LAST:
+            case LAST:
                 sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[resultCount-1]
                 break
-            case model.RANDOM:
+            case RANDOM:
                 if resultCount > 1 {
                     sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount - 1)]
                 } else {

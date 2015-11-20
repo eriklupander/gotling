@@ -1,7 +1,6 @@
 package main
 import (
-	"github.com/eriklupander/goload/model"
-    "log"
+	"log"
 )
 
 type HttpAction struct {
@@ -13,8 +12,7 @@ type HttpAction struct {
 	ResponseHandler HttpResponseHandler `yaml:"response"`
 }
 
-func (h HttpAction) Execute(resultsChannel chan model.HttpReqResult, sessionMap map[string]string) {
-
+func (h HttpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
 	DoHttpRequest(h, resultsChannel, sessionMap)
 }
 
