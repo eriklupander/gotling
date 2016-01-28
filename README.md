@@ -1,6 +1,8 @@
 # gotling
 Simple golang-based load test application using YAML documents as specification.
 
+For a more full-blown explanation of what Gotling is about, see my blog post here: http://callistaenterprise.se/blogg/teknik/2015/11/22/gotling/
+
 _Please note that this is my very first golang program and is probably full of anti-patterns and bad use of golang constructs._
 
 ## What it does
