@@ -12,7 +12,7 @@ _Please note that this is my very first golang program and is probably full of a
 - TCP sockets
     - Can send line-terminated text strings
     - Possible to use ${varname} variables in payload
-    - Does not currently support body parsing or variable extraction from TCP response data.
+    - Does not currently support body parsing or variable extraction from data incoming on the TCP socket.
 
 ## Usage
 Define your test setup in a .yml file
