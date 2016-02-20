@@ -1,7 +1,7 @@
 ---
-iterations: 10
+iterations: 3
 users: 2
-rampup: 10
+rampup: 3
 actions:
   - http:
       title: Read google.com
