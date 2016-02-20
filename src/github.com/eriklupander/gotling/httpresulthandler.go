@@ -56,7 +56,9 @@ func acceptResults(resChannel chan HttpReqResult) {
 		case msg := <-resChannel:
 			perSecondAggregatorChannel <- &msg
 			writeResult(&msg) // sync write result to file for later processing.
+            break
 		case <-	time.After(100 * time.Microsecond):
+            break
 //		default:
 //			// This is troublesome. If too high, throughput is bad. Too low, CPU use goes up too much
 //			// Using a sync channel kills performance

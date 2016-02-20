@@ -7,10 +7,10 @@ import(
     "fmt"
     "sync"
     //"github.com/davecheney/profile"
-
     "math/rand"
     "strconv"
     "gopkg.in/yaml.v2"
+    "log"
 )
 
 
@@ -37,7 +37,6 @@ func main() {
         return
     }
 
-
     actions, isValid := buildActionList(&t)
     if !isValid {
         return
@@ -45,6 +44,8 @@ func main() {
 
     if t.Feeder.Type == "csv" {
         Csv(t.Feeder.Filename, ",")
+    } else if t.Feeder.Type != "" {
+        log.Fatal("Unsupported feeder type: " + t.Feeder.Type)
     }
 
     OpenResultsFile(dir + "/results/log/latest.log" )
@@ -98,7 +99,7 @@ func launchActions(t *TestDef, resultsChannel chan HttpReqResult, wg *sync.WaitG
         // If we have feeder data, pop an item and push its key-value pairs into the sessionMap
         feedSession(t, sessionMap)
 
-        // Iterate over the actions. Note the
+        // Iterate over the actions. Note the use of the command-pattern like Execute method on the Action interface
         for _, action := range actions {
 			if action != nil {
 				action.(Action).Execute(resultsChannel, sessionMap)

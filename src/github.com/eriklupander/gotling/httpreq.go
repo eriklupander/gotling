@@ -19,21 +19,27 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, ses
 	start := time.Now()
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
-	}
-	elapsed := time.Since(start)
-	responseBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        log.Fatal(err)
+        //log.Printf("HTTP request failed")
+	} else {
+        elapsed := time.Since(start)
+        responseBody, err := ioutil.ReadAll(resp.Body)
+        if err != nil {
+            //log.Fatal(err)
+            log.Printf("Reading HTTP response failed: %s\n", err)
+            httpReqResult := buildHttpResult(0, resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+
+            resultsChannel <- httpReqResult
+
+        } else {
+            defer resp.Body.Close()
+            // if action specifies response action, parse using regexp/jsonpath
+            processResult(httpAction, sessionMap, responseBody)
+
+            httpReqResult := buildHttpResult(len(responseBody), resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+
+            resultsChannel <- httpReqResult
+        }
     }
-
-    defer resp.Body.Close()
-	// if action specifies response action, parse using regexp/jsonpath
-    processResult(httpAction, sessionMap, responseBody)
-
-    httpReqResult := buildHttpResult(len(responseBody), resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
-
-	resultsChannel <- httpReqResult
 }
 
 func buildHttpResult(contentLength int, status int, elapsed int64, title string) (HttpReqResult){

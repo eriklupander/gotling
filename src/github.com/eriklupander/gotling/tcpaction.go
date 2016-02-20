@@ -3,6 +3,7 @@ package main
 type TcpAction struct {
 	Address string `yaml:"address"`
 	Payload string `yaml:"payload"`
+	Title string `yaml:"title"`
 }
 
 func (t TcpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
@@ -15,5 +16,6 @@ func NewTcpAction(a map[interface{}]interface{}) TcpAction {
 	return TcpAction{
 		a["address"].(string),
 		a["payload"].(string),
+		a["title"].(string),
 	}
 }
