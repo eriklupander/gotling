@@ -16,6 +16,42 @@ _Please note that this is my very first golang program and is probably full of a
     - Possible to use ${varname} variables in payload
     - Does not currently support body parsing or variable extraction from data incoming on the TCP socket.
 
+## Building
+
+Of course you need the Go SDK, I think I've used version 1.5 or so. These instructions are based on OS X 10.11, but should apply to Windows and Linux too.
+
+#### 1. Clone the source from github
+    git clone git@github.com:eriklupander/gotling.git
+    
+#### 2. Open a command shell 
+Go into the root project directory, for example ~/projects/gotling.
+
+#### 3. Set GOPATH
+
+    export GOPATH=~/projects/gotling
+    
+#### 4. Use go get to fethc deps
+
+    cd src/github.com/eriklupander/gotling
+    go get
+    
+May take a little while, after go get finishes, you should see 
+
+    src/github.com/NodePrime/
+    src/github.com/eriklupander/
+    src/github.com/gorilla/
+    src/github.com/tobyhede/
+    src/gopkg.in/yaml.v2/
+    
+#### 5. Run
+
+To run the standard bundled "demo" simulation, use go run like this:
+
+    cd ~/projects/gotling
+    go run src/github.com/eriklupander/gotling/*.go samples/demosimulation.yml
+    
+
+
 ## Usage
 Define your test setup in a .yml file
 
