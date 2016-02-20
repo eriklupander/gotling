@@ -19,7 +19,12 @@ func OpenResultsFile(fileName string) {
     }
     f, err = os.Create(fileName)
     if err != nil {
-        panic(err)
+    	os.Mkdir("results", 0777);
+        os.Mkdir("results/log", 0777);
+        f, err = os.Create(fileName)
+        if err != nil {
+            panic(err)
+        }
     }
     w = bufio.NewWriter(f)
     _, err = w.WriteString(string("var logdata = '"))

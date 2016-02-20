@@ -1,0 +1,12 @@
+---
+iterations: 10
+users: 2
+rampup: 10
+actions:
+  - http:
+      title: Read google.com
+      method: GET
+      url: https://www.google.com
+      accept: json
+  - sleep:
+      duration: 3
