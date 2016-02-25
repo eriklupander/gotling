@@ -21,16 +21,18 @@ _Please note that this is my very first golang program and is probably full of a
 Of course you need the Go SDK, I think I've used version 1.5 or so. These instructions are based on OS X 10.11, but should apply to Windows and Linux too.
 
 #### 1. Clone the source from github
-    git clone git@github.com:eriklupander/gotling.git
+    git clone https://github.com/eriklupander/gotling.git
     
 #### 2. Open a command shell 
 Go into the root project directory, for example ~/projects/gotling.
 
-#### 3. Set GOPATH
+#### 3. Build with Go tools
+
+##### 3.1. Set GOPATH
 
     export GOPATH=~/projects/gotling
     
-#### 4. Use go get to fethc deps
+##### 3.2. Use go get to fethc deps
 
     cd src/github.com/eriklupander/gotling
     go get
@@ -43,6 +45,21 @@ May take a little while, after go get finishes, you should see
     src/github.com/tobyhede/
     src/gopkg.in/yaml.v2/
     
+
+#### 4. Or, Butild with [gb](https://getgb.io)
+
+assume you have gb installed by following [the official guide](https://getgb.io).
+
+```bash
+# fetch to restore the deps
+gb vendor restore
+
+# now build it at project root
+gb build
+
+# the generated executable binary is at $PROJECT/bin/
+```
+
 #### 5. Run
 
 To run the standard bundled "demo" simulation, use go run like this:
