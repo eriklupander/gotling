@@ -1,38 +1,35 @@
 package main
+
 import (
-	"log"
+    "log"
 )
 
 type HttpAction struct {
-	Method string `yaml:"method"`
-	Url string `yaml:"url"`
-	Body string `yaml:"body"`
-	Accept string `yaml:"accept"`
-	Title string `yaml:"title"`
-	ResponseHandler HttpResponseHandler `yaml:"response"`
+    Method          string              `yaml:"method"`
+    Url             string              `yaml:"url"`
+    Body            string              `yaml:"body"`
+    Accept          string              `yaml:"accept"`
+    Title           string              `yaml:"title"`
+    ResponseHandler HttpResponseHandler `yaml:"response"`
 }
 
 func (h HttpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
-	DoHttpRequest(h, resultsChannel, sessionMap)
+    DoHttpRequest(h, resultsChannel, sessionMap)
 }
 
 type HttpResponseHandler struct {
-	Jsonpath string `yaml:"jsonpath"`
-	Variable string `yaml:"variable"`
-	Index string `yaml:"index"`
+    Jsonpath string `yaml:"jsonpath"`
+    Variable string `yaml:"variable"`
+    Index    string `yaml:"index"`
 }
 
 func NewHttpAction(a map[interface{}]interface{}) HttpAction {
     var valid bool = true
-    if a["accept"] == nil || a["accept"] != "json" {
-        log.Println("Error: HttpAction only accepts 'json' as Accept")
-        valid = false
-    }
     if a["url"] == "" || a["url"] == nil {
         log.Println("Error: HttpAction must define a URL")
         valid = false
     }
-    if a["method"] == nil || (a["method"] != "GET" && a["method"] != "POST" && a["method"] != "PUT" && a["method"] != "DELETE")  {
+    if a["method"] == nil || (a["method"] != "GET" && a["method"] != "POST" && a["method"] != "PUT" && a["method"] != "DELETE") {
         log.Println("Error: HttpAction must specify a HTTP method: GET, POST, PUT or DELETE")
         valid = false
     }
@@ -51,7 +48,7 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
             log.Println("Error: HttpAction ResponseHandler must define a Jsonpath")
             valid = false
         }
-        if r["variable"] == nil ||  r["variable"] == "" {
+        if r["variable"] == nil || r["variable"] == "" {
             log.Println("Error: HttpAction ResponseHandler must define a Variable")
             valid = false
         }
@@ -67,14 +64,19 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
         responseHandler.Variable = response["variable"].(string)
         responseHandler.Index = response["index"].(string)
     }
+
+    accept := "text/html,application/json,application/xhtml+xml,application/xml,text/plain"
+    if a["accept"] != nil && len(a["accept"].(string)) > 0 {
+        accept = a["accept"].(string)
+    }
+
     httpAction := HttpAction{
         a["method"].(string),
         a["url"].(string),
         getBody(a),
-        a["accept"].(string),
+        accept,
         a["title"].(string),
         responseHandler}
 
     return httpAction
-
 }
