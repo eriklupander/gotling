@@ -7,8 +7,9 @@ import (
     "net/http"
     "strings"
     "time"
-
+    "gopkg.in/xmlpath.v2"
     "github.com/NodePrime/jsonpath"
+    "bytes"
 )
 
 // Accepts a Httpaction and a one-way channel to write the results to.
@@ -73,9 +74,12 @@ func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http
  * If the httpAction specifies a Jsonpath in the Response, try to extract value(s)
  * from the responseBody.
  *
+ * TODO extract both Jsonpath handling and Xmlpath handling into separate functions, and write tests for them.
+ *
  * Uses github.com/NodePrime/jsonpath
  */
 func processResult(httpAction HttpAction, sessionMap map[string]string, responseBody []byte) {
+    log.Println("ENTER - processResult")
     if httpAction.ResponseHandler.Jsonpath != "" {
         paths, err := jsonpath.ParsePaths(httpAction.ResponseHandler.Jsonpath)
         if err != nil {
@@ -101,27 +105,34 @@ func processResult(httpAction HttpAction, sessionMap map[string]string, response
             panic(eval.Error)
         }
 
-        resultCount := len(resultsArray)
+        passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
+    }
 
-        if resultCount > 0 {
-            switch httpAction.ResponseHandler.Index {
-            case FIRST:
-                sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
-                break
-            case LAST:
-                sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[resultCount-1]
-                break
-            case RANDOM:
-                if resultCount > 1 {
-                    sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount-1)]
+
+    if httpAction.ResponseHandler.Xmlpath != "" {
+        log.Println("ENTER - xmlPath")
+        path := xmlpath.MustCompile(httpAction.ResponseHandler.Xmlpath)
+        r := bytes.NewReader(responseBody)
+        root, err := xmlpath.Parse(r)
+
+        if err != nil {
+            log.Fatal(err)
+        }
+
+        iterator := path.Iter(root)
+        hasNext := iterator.Next()
+        if hasNext {
+            resultsArray := make([]string, 0, 10)
+            for {
+                if hasNext {
+                    node := iterator.Node()
+                    resultsArray = append(resultsArray, node.String())
+                    hasNext = iterator.Next()
                 } else {
-                    sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
+                    break
                 }
-                break
             }
-
-        } else {
-            // TODO how to handle requested, but missing result?
+            passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
         }
     }
 }
@@ -140,4 +151,31 @@ func trimChar(s string, r byte) string {
         s = s[1:sz]
     }
     return s
+}
+
+
+
+func passResultIntoSessionMap(resultsArray []string, httpAction HttpAction, sessionMap map[string]string) {
+    resultCount := len(resultsArray)
+
+    if resultCount > 0 {
+        switch httpAction.ResponseHandler.Index {
+        case FIRST:
+            sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
+            break
+        case LAST:
+            sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[resultCount-1]
+            break
+        case RANDOM:
+            if resultCount > 1 {
+                sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount-1)]
+            } else {
+                sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
+            }
+            break
+        }
+
+    } else {
+        // TODO how to handle requested, but missing result?
+    }
 }

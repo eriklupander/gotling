@@ -118,7 +118,27 @@ These values can be accessed through ${varname} matching the column header.
 #### The UID
 Each "user" gets a unique "UID" assigned to it, typically an integer from 10000 + random(no of users). Perhaps I can tweak this to either use UUID's or configurable intervals. Anyway, the UID can be used using ${UID} and can be useful for grouping data etc.
 
+### Variable capture from HTTP response bodies
+It's possible to use jsonpath OR xmlpath to capture variables from HTTP responses (json or xml) and use in subsequent invocations during the ongoing sequence of actions. See ${courseId} in the sample above.
 
+A similar sample for xmlpath:
+
+    - http:
+              method: GET
+              url: http://www.w3schools.com/xml/cd_catalog.xml
+              accept: text/xml
+              response:
+                xmlpath: //title
+                variable: myTitleVar
+                index: random
+    - http:
+              method: GET
+              url: http://some.other.service.maybe/authors/${myTitleVar}
+              accept: json
+                    
+Please note that a response definition only may contain either a jsonpath OR an xmlpath. You can't have both.
+
+For more on xmlpath, see   [xmlpath](https://godoc.org/gopkg.in/xmlpath.v2)
 
 ## Realtime dashboard
 Access at http://localhost:8182
@@ -127,8 +147,13 @@ Click "connect" to connect to the currently executing test.
 
 ![Gotling dashboard](gotling-dashboard.png)
 
+## HTML report
+Work in progress, not functional right now :(
+
 ## Uses the following libraries
+- github.com/davecheney/profile
 - gopkg.in/yaml.v2
+- gopkg.in/xmlpath.v2
 - NodePrime/jsonpath - https://github.com/NodePrime/jsonpath/blob/master/README.md
 - gorilla/websocket
 - highcharts

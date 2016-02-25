@@ -1,0 +1,19 @@
+---
+iterations: 1
+users: 1
+rampup: 3
+actions:
+  - http:
+      title: Read sample XML file
+      method: GET
+      url: http://www.w3schools.com/xml/cd_catalog.xml
+      accept: text/xml
+      response:
+              xmlpath: ///TITLE
+              jsonpath: $[*].id+
+              variable: noteTo
+              index: random # first, random, last
+  - sleep:
+      duration: 3
+
+

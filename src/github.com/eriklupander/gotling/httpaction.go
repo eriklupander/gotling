@@ -19,6 +19,7 @@ func (h HttpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[st
 
 type HttpResponseHandler struct {
     Jsonpath string `yaml:"jsonpath"`
+    Xmlpath string `yaml:"xmlpath"`
     Variable string `yaml:"variable"`
     Index    string `yaml:"index"`
 }
@@ -44,10 +45,17 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
             log.Println("Error: HttpAction ResponseHandler must define an Index of either of: first, last or random")
             valid = false
         }
-        if r["jsonpath"] == nil || r["jsonpath"] == "" {
-            log.Println("Error: HttpAction ResponseHandler must define a Jsonpath")
+        if (r["jsonpath"] == nil || r["jsonpath"] == "") && (r["xmlpath"] == nil || r["xmlpath"] == "") {
+            log.Println("Error: HttpAction ResponseHandler must define a Jsonpath or a Xmlpath")
             valid = false
         }
+        if (r["jsonpath"] != nil && r["jsonpath"] != "") && (r["xmlpath"] != nil && r["xmlpath"] != "") {
+            log.Println("Error: HttpAction ResponseHandler can only define either a Jsonpath OR a Xmlpath")
+            valid = false
+        }
+
+        // TODO perhaps compile Xmlpath expressions so we can validate early?
+
         if r["variable"] == nil || r["variable"] == "" {
             log.Println("Error: HttpAction ResponseHandler must define a Variable")
             valid = false
@@ -60,7 +68,14 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
     var responseHandler HttpResponseHandler
     if a["response"] != nil {
         response := a["response"].(map[interface{}]interface{})
-        responseHandler.Jsonpath = response["jsonpath"].(string)
+
+        if response["jsonpath"] != nil && response["jsonpath"] != "" {
+            responseHandler.Jsonpath = response["jsonpath"].(string)
+        }
+        if response["xmlpath"] != nil && response["xmlpath"] != "" {
+            responseHandler.Xmlpath = response["xmlpath"].(string)
+        }
+
         responseHandler.Variable = response["variable"].(string)
         responseHandler.Index = response["index"].(string)
     }

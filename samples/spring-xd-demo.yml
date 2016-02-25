@@ -1,7 +1,7 @@
 ---
-iterations: 50
-users: 200
-rampup: 30
+iterations: 500
+users: 2000
+rampup: 60
 feeder:
   type: csv #csv, json
   filename: fleetdata.csv
@@ -17,5 +17,6 @@ actions:
   - sleep:
       duration: 1
   - tcp:
-      address: 127.0.0.1:8081
-      payload: VEHICLE|DATAPOINT|${UID}|${dp1}|${dp2}|${dp3}|${dp4}|${dp5}
+      title: TCP packet
+      address: 127.0.0.1:8181
+      payload: ${UID}|${dp1}|${dp2}|${dp3}|${dp4}|${dp5}
