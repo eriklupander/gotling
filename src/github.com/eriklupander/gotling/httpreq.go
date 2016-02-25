@@ -1,26 +1,25 @@
 package main
 
 import (
-	"net/http"
-	"log"
-	"io/ioutil"
-	"time"
-	"github.com/NodePrime/jsonpath"
-     "math/rand"
-     "strings"
-)
+    "io/ioutil"
+    "log"
+    "math/rand"
+    "net/http"
+    "strings"
+    "time"
 
+    "github.com/NodePrime/jsonpath"
+)
 
 // Accepts a Httpaction and a one-way channel to write the results to.
 func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, sessionMap map[string]string) {
-
     req := buildHttpRequest(httpAction, sessionMap)
-	client := &http.Client{}
-	start := time.Now()
-	resp, err := client.Do(req)
-	if err != nil {
+    client := &http.Client{}
+    start := time.Now()
+    resp, err := client.Do(req)
+    if err != nil {
         //log.Printf("HTTP request failed")
-	} else {
+    } else {
         elapsed := time.Since(start)
         responseBody, err := ioutil.ReadAll(resp.Body)
         if err != nil {
@@ -29,7 +28,6 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, ses
             httpReqResult := buildHttpResult(0, resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
 
             resultsChannel <- httpReqResult
-
         } else {
             defer resp.Body.Close()
             // if action specifies response action, parse using regexp/jsonpath
@@ -42,8 +40,8 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, ses
     }
 }
 
-func buildHttpResult(contentLength int, status int, elapsed int64, title string) (HttpReqResult){
-    httpReqResult := HttpReqResult {
+func buildHttpResult(contentLength int, status int, elapsed int64, title string) HttpReqResult {
+    httpReqResult := HttpReqResult{
         "HTTP",
         elapsed,
         contentLength,
@@ -53,7 +51,6 @@ func buildHttpResult(contentLength int, status int, elapsed int64, title string)
     }
     return httpReqResult
 }
-
 
 func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http.Request {
     var req *http.Request
@@ -116,7 +113,7 @@ func processResult(httpAction HttpAction, sessionMap map[string]string, response
                 break
             case RANDOM:
                 if resultCount > 1 {
-                    sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount - 1)]
+                    sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount-1)]
                 } else {
                     sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
                 }
