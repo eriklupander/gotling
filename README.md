@@ -32,7 +32,7 @@ Go into the root project directory, for example ~/projects/gotling.
 
     export GOPATH=~/projects/gotling
     
-##### 3.2. Use go get to fethc deps
+##### 3.2. Use go get to fetch deps
 
     cd src/github.com/eriklupander/gotling
     go get
@@ -46,9 +46,9 @@ May take a little while, after go get finishes, you should see
     src/gopkg.in/yaml.v2/
     
 
-#### 4. Or, Butild with [gb](https://getgb.io)
+#### 4. Or, build with [gb](https://getgb.io)
 
-assume you have gb installed by following [the official guide](https://getgb.io).
+Assume you have gb installed by following [the official guide](https://getgb.io).
 
 ```bash
 # fetch to restore the deps
@@ -60,14 +60,17 @@ gb build
 # the generated executable binary is at $PROJECT/bin/
 ```
 
-#### 5. Run
+#### 5.1 Run from source
 
 To run the standard bundled "demo" simulation, use go run like this:
 
     cd ~/projects/gotling
     go run src/github.com/eriklupander/gotling/*.go samples/demosimulation.yml
     
+#### 5.2 Run from binary
+If you built gotling using gb, a binary now resides in $PROJECT/bin
 
+    bin/gotling samples/demosimulation.yml 
 
 ## Usage
 Define your test setup in a .yml file
