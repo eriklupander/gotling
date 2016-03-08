@@ -33,6 +33,7 @@ type HttpAction struct {
     Body            string              `yaml:"body"`
     Accept          string              `yaml:"accept"`
     Title           string              `yaml:"title"`
+    Client          string              `yaml:"client"`
     ResponseHandler HttpResponseHandler `yaml:"response"`
 }
 
@@ -42,7 +43,7 @@ func (h HttpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[st
 
 type HttpResponseHandler struct {
     Jsonpath string `yaml:"jsonpath"`
-    Xmlpath string `yaml:"xmlpath"`
+    Xmlpath  string `yaml:"xmlpath"`
     Variable string `yaml:"variable"`
     Index    string `yaml:"index"`
 }
@@ -108,12 +109,19 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
         accept = a["accept"].(string)
     }
 
+    // default http client as Go net/http
+    httpclient := "std"
+    if a["client"] != nil && len(a["client"].(string)) > 0 {
+        httpclient = a["client"].(string)
+    }
+
     httpAction := HttpAction{
         a["method"].(string),
         a["url"].(string),
         getBody(a),
         accept,
         a["title"].(string),
+        httpclient,
         responseHandler}
 
     return httpAction

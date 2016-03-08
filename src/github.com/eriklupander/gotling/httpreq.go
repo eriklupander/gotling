@@ -24,42 +24,76 @@ SOFTWARE.
 package main
 
 import (
+    "bytes"
     "io/ioutil"
     "log"
     "math/rand"
     "net/http"
     "strings"
     "time"
-    "gopkg.in/xmlpath.v2"
+
     "github.com/NodePrime/jsonpath"
-    "bytes"
+    "github.com/valyala/fasthttp"
+    "gopkg.in/xmlpath.v2"
 )
 
 // Accepts a Httpaction and a one-way channel to write the results to.
 func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, sessionMap map[string]string) {
-    req := buildHttpRequest(httpAction, sessionMap)
-    client := &http.Client{}
-    start := time.Now()
-    resp, err := client.Do(req)
-    if err != nil {
-        //log.Printf("HTTP request failed")
-    } else {
+    if httpAction.Client == "fasthttp" {
+        // TODO ADD TLS CERT CONF SUPPORT
+        c := &fasthttp.Client{}
+
+        req := fasthttp.AcquireRequest()
+        req.Header.SetMethod(httpAction.Method)
+        req.Header.SetRequestURI(SubstParams(sessionMap, httpAction.Url))
+        req.Header.Set("Accept", httpAction.Accept)
+
+        resp := fasthttp.AcquireResponse()
+
+        defer fasthttp.ReleaseResponse(resp)
+        defer fasthttp.ReleaseRequest(req)
+
+        // TODO ADD TIMEOUT SUPPORT
+        start := time.Now()
+        err := c.Do(req, resp)
         elapsed := time.Since(start)
-        responseBody, err := ioutil.ReadAll(resp.Body)
         if err != nil {
-            //log.Fatal(err)
-            log.Printf("Reading HTTP response failed: %s\n", err)
-            httpReqResult := buildHttpResult(0, resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+            log.Printf("Send HTTP request failed: %s\n", err)
+            httpReqResult := buildHttpResult(0, resp.Header.StatusCode(), elapsed.Nanoseconds(), httpAction.Title)
 
             resultsChannel <- httpReqResult
         } else {
-            defer resp.Body.Close()
-            // if action specifies response action, parse using regexp/jsonpath
+            responseBody := resp.Body()
             processResult(httpAction, sessionMap, responseBody)
-
-            httpReqResult := buildHttpResult(len(responseBody), resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+            httpReqResult := buildHttpResult(len(responseBody), resp.Header.StatusCode(), elapsed.Nanoseconds(), httpAction.Title)
 
             resultsChannel <- httpReqResult
+        }
+    } else {
+        req := buildHttpRequest(httpAction, sessionMap)
+        client := &http.Client{}
+        start := time.Now()
+        resp, err := client.Do(req)
+        if err != nil {
+            //log.Printf("HTTP request failed")
+        } else {
+            responseBody, err := ioutil.ReadAll(resp.Body)
+            elapsed := time.Since(start)
+            if err != nil {
+                //log.Fatal(err)
+                log.Printf("Reading HTTP response failed: %s\n", err)
+                httpReqResult := buildHttpResult(0, resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+
+                resultsChannel <- httpReqResult
+            } else {
+                defer resp.Body.Close()
+                // if action specifies response action, parse using regexp/jsonpath
+                processResult(httpAction, sessionMap, responseBody)
+
+                httpReqResult := buildHttpResult(len(responseBody), resp.StatusCode, elapsed.Nanoseconds(), httpAction.Title)
+
+                resultsChannel <- httpReqResult
+            }
         }
     }
 }
@@ -130,7 +164,6 @@ func processResult(httpAction HttpAction, sessionMap map[string]string, response
         passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
     }
 
-
     if httpAction.ResponseHandler.Xmlpath != "" {
         path := xmlpath.MustCompile(httpAction.ResponseHandler.Xmlpath)
         r := bytes.NewReader(responseBody)
@@ -173,8 +206,6 @@ func trimChar(s string, r byte) string {
     }
     return s
 }
-
-
 
 func passResultIntoSessionMap(resultsArray []string, httpAction HttpAction, sessionMap map[string]string) {
     resultCount := len(resultsArray)
