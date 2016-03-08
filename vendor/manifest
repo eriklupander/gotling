@@ -21,6 +21,39 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/klauspost/compress/flate",
+			"repository": "https://github.com/klauspost/compress",
+			"revision": "2d3d403f37d2e70b722590bc286076a17422e1f2",
+			"branch": "master",
+			"path": "/flate"
+		},
+		{
+			"importpath": "github.com/klauspost/compress/gzip",
+			"repository": "https://github.com/klauspost/compress",
+			"revision": "2d3d403f37d2e70b722590bc286076a17422e1f2",
+			"branch": "master",
+			"path": "/gzip"
+		},
+		{
+			"importpath": "github.com/klauspost/compress/zlib",
+			"repository": "https://github.com/klauspost/compress",
+			"revision": "2d3d403f37d2e70b722590bc286076a17422e1f2",
+			"branch": "master",
+			"path": "/zlib"
+		},
+		{
+			"importpath": "github.com/klauspost/cpuid",
+			"repository": "https://github.com/klauspost/cpuid",
+			"revision": "2c698c6aef5976c7860074cc7040e8af7866aa21",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/klauspost/crc32",
+			"repository": "https://github.com/klauspost/crc32",
+			"revision": "19b0b332c9e4516a6370a0456e6182c3b5036720",
+			"branch": "master"
+		},
+		{
 			"importpath": "github.com/ogier/pflag",
 			"repository": "https://github.com/ogier/pflag",
 			"revision": "45c278ab3607870051a2ea9040bb85fcb8557481",
@@ -31,6 +64,25 @@
 			"repository": "https://github.com/tobyhede/go-underscore",
 			"revision": "ea55fc9569918f099b1dfa785088434e5c53544d",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/valyala/fasthttp",
+			"repository": "https://github.com/valyala/fasthttp",
+			"revision": "76e0faee327084209784ab4276ce37d8cd7b21be",
+			"branch": "master"
+		},
+		{
+			"importpath": "golang.org/x/net/html",
+			"repository": "https://go.googlesource.com/net",
+			"revision": "a4bbce9fcae005b22ae5443f6af064d80a6f5a55",
+			"branch": "master",
+			"path": "/html"
+		},
+		{
+			"importpath": "gopkg.in/xmlpath.v2",
+			"repository": "https://gopkg.in/xmlpath.v2",
+			"revision": "860cbeca3ebcc600db0b213c0e83ad6ce91f5739",
+			"branch": "v2"
 		},
 		{
 			"importpath": "gopkg.in/yaml.v2",
