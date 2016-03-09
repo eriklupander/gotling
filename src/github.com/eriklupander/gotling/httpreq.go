@@ -43,15 +43,12 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, ses
         // TODO ADD TLS CERT CONF SUPPORT
         c := &fasthttp.Client{}
 
-        req := fasthttp.AcquireRequest()
+        req := &fasthttp.Request{}
         req.Header.SetMethod(httpAction.Method)
         req.Header.SetRequestURI(SubstParams(sessionMap, httpAction.Url))
         req.Header.Set("Accept", httpAction.Accept)
 
-        resp := fasthttp.AcquireResponse()
-
-        defer fasthttp.ReleaseResponse(resp)
-        defer fasthttp.ReleaseRequest(req)
+        resp := &fasthttp.Response{}
 
         // TODO ADD TIMEOUT SUPPORT
         start := time.Now()
