@@ -166,6 +166,8 @@ Please note that a response definition only may contain either a jsonpath OR an 
 
 For more on xmlpath, see   [xmlpath](https://godoc.org/gopkg.in/xmlpath.v2)
 
+##### Important note: xmlpath for Go does not support xml namespaces!
+
 ## Realtime dashboard
 Access at http://localhost:8182
 
