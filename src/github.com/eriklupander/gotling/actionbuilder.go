@@ -24,6 +24,8 @@ SOFTWARE.
 package main
 import (
 	"log"
+"os"
+"io/ioutil"
 )
 
 func buildActionList(t *TestDef) ([]Action, bool) {
@@ -57,9 +59,21 @@ func buildActionList(t *TestDef) ([]Action, bool) {
 }
 
 func getBody(action map[interface{}]interface{}) string {
-	var body string = ""
+	//var body string = ""
 	if action["body"] != nil {
-		body = action["body"].(string)
+		return action["body"].(string)
+	} else {
+		return "";
 	}
-	return body
+}
+
+func getTemplate(action map[interface{}]interface{}) string {
+	if action["template"] != nil {
+		var templateFile = action["template"].(string)
+		dir, _ := os.Getwd()
+		templateData, _ := ioutil.ReadFile(dir + "/templates/" + templateFile)
+		return string(templateData)
+	} else {
+		return ""
+	}
 }

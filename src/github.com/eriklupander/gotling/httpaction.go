@@ -31,6 +31,7 @@ type HttpAction struct {
     Method          string              `yaml:"method"`
     Url             string              `yaml:"url"`
     Body            string              `yaml:"body"`
+    Template        string              `yaml:"template"`
     Accept          string              `yaml:"accept"`
     Title           string              `yaml:"title"`
     ResponseHandler HttpResponseHandler `yaml:"response"`
@@ -50,7 +51,7 @@ type HttpResponseHandler struct {
 func NewHttpAction(a map[interface{}]interface{}) HttpAction {
     var valid bool = true
     if a["url"] == "" || a["url"] == nil {
-        log.Println("Error: HttpAction must define a URL")
+        log.Println("Error: HttpAction must define a URL.")
         valid = false
     }
     if a["method"] == nil || (a["method"] != "GET" && a["method"] != "POST" && a["method"] != "PUT" && a["method"] != "DELETE") {
@@ -58,29 +59,34 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
         valid = false
     }
     if a["title"] == nil || a["title"] == "" {
-        log.Println("Error: HttpAction must define a title")
+        log.Println("Error: HttpAction must define a title.")
+        valid = false
+    }
+
+    if a["body"] != nil && a["template"] != nil {
+        log.Println("Error: A HttpAction can not define both a 'body' and a 'template'.")
         valid = false
     }
 
     if a["response"] != nil {
         r := a["response"].(map[interface{}]interface{})
         if r["index"] == nil || r["index"] == "" || (r["index"] != "first" && r["index"] != "last" && r["index"] != "random") {
-            log.Println("Error: HttpAction ResponseHandler must define an Index of either of: first, last or random")
+            log.Println("Error: HttpAction ResponseHandler must define an Index of either of: first, last or random.")
             valid = false
         }
         if (r["jsonpath"] == nil || r["jsonpath"] == "") && (r["xmlpath"] == nil || r["xmlpath"] == "") {
-            log.Println("Error: HttpAction ResponseHandler must define a Jsonpath or a Xmlpath")
+            log.Println("Error: HttpAction ResponseHandler must define a Jsonpath or a Xmlpath.")
             valid = false
         }
         if (r["jsonpath"] != nil && r["jsonpath"] != "") && (r["xmlpath"] != nil && r["xmlpath"] != "") {
-            log.Println("Error: HttpAction ResponseHandler can only define either a Jsonpath OR a Xmlpath")
+            log.Println("Error: HttpAction ResponseHandler can only define either a Jsonpath OR a Xmlpath.")
             valid = false
         }
 
         // TODO perhaps compile Xmlpath expressions so we can validate early?
 
         if r["variable"] == nil || r["variable"] == "" {
-            log.Println("Error: HttpAction ResponseHandler must define a Variable")
+            log.Println("Error: HttpAction ResponseHandler must define a Variable.")
             valid = false
         }
     }
@@ -112,6 +118,7 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
         a["method"].(string),
         a["url"].(string),
         getBody(a),
+        getTemplate(a),
         accept,
         a["title"].(string),
         responseHandler}

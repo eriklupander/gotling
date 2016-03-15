@@ -82,6 +82,9 @@ func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http
     if httpAction.Body != "" {
         reader := strings.NewReader(SubstParams(sessionMap, httpAction.Body))
         req, err = http.NewRequest(httpAction.Method, SubstParams(sessionMap, httpAction.Url), reader)
+    } else if httpAction.Template != "" {
+        reader := strings.NewReader(SubstParams(sessionMap, httpAction.Template))
+        req, err = http.NewRequest(httpAction.Method, SubstParams(sessionMap, httpAction.Url), reader)
     } else {
         req, err = http.NewRequest(httpAction.Method, SubstParams(sessionMap, httpAction.Url), nil)
     }
@@ -156,6 +159,8 @@ func processResult(httpAction HttpAction, sessionMap map[string]string, response
             passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
         }
     }
+
+    //log.Println(string(responseBody))
 }
 
 /**
