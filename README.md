@@ -11,6 +11,7 @@ _Please note that this is my very first golang program and is probably full of a
     - Live metrics using HTML5 canvas from canvasjs
     - Request URLs and bodies can contain ${paramName} parameters
     - ${paramName} values can be extracted from HTTP response bodies and bound to a User context
+    - POST data can be inlined or read from template files
 - TCP sockets
     - Can send line-terminated text strings
     - Possible to use ${varname} variables in payload
@@ -104,6 +105,31 @@ Define your test setup in a .yml file
       - tcp:
             address: 127.0.0.1:8081                     # TCP socket connection
             payload: |TYPE|1|${UID}|${email}            # Sample data using parameter substitution
+
+### HTTP POST bodies
+Gotling supports POST/PUT bodies either directly inlined in the YAML specification, or read from a template file:
+
+#### Inlined
+
+    - http:
+        title: Some title
+        method: POST
+        url: http://localhost:9183/mypath
+        body: '{"id":100,"name":"Some name","author":"${author}-${someId}","created":"2015-10-23T21:33:38.254+02:00","baseLatitude":45.634353,"baseLongitude":11.3424324}'
+        accept: application/json
+
+Note that we use _body_ in the inlined example
+
+#### From template
+
+    - http:
+        title: Submit query
+        method: POST
+        url: http://localhost:8080/myxmlservice
+        template: myproject/MyFancySOAPRequest.xml
+        accept: application/xml
+
+In this example, we use _template_ instead of _body_. The _myproject/_ folder should always be placed in the /templates directory in the root of the project. Note that ${varName} variable substitution from feeders (see below) or values captured from previous responses in the action sequence can be used in template files.  
 
 ### Feeders and user context
 Gotling currently support CSV feeds of data. First line needs to be comma-separated headers with the following lines containing data, e.g:
