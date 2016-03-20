@@ -41,7 +41,9 @@ import (
 func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, sessionMap map[string]string) {
     if httpAction.Client == "fasthttp" {
         // TODO ADD TLS CERT CONF SUPPORT
-        c := &fasthttp.Client{}
+        c := &fasthttp.Client{
+            DisableHeaderNamesNormalizing: true,
+        }
 
         req := &fasthttp.Request{}
         req.Header.SetMethod(httpAction.Method)
