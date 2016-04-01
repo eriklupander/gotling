@@ -30,19 +30,26 @@ import (
     "net/http"
     "strings"
     "time"
+    //"fmt"
     "gopkg.in/xmlpath.v2"
     "github.com/NodePrime/jsonpath"
     "bytes"
+    "crypto/tls"
+
 )
 
 // Accepts a Httpaction and a one-way channel to write the results to.
 func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, sessionMap map[string]string) {
     req := buildHttpRequest(httpAction, sessionMap)
-    client := &http.Client{}
+
     start := time.Now()
-    resp, err := client.Do(req)
+    var DefaultTransport http.RoundTripper = &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+    }
+    resp, err := DefaultTransport.RoundTrip(req)
+
     if err != nil {
-        //log.Printf("HTTP request failed")
+        log.Printf("HTTP request failed: %s", err)
     } else {
         elapsed := time.Since(start)
         responseBody, err := ioutil.ReadAll(resp.Body)
@@ -54,6 +61,17 @@ func DoHttpRequest(httpAction HttpAction, resultsChannel chan HttpReqResult, ses
             resultsChannel <- httpReqResult
         } else {
             defer resp.Body.Close()
+
+
+            if httpAction.StoreCookie != "" {
+                for _, cookie := range resp.Cookies() {
+
+                    if cookie.Name == httpAction.StoreCookie {
+                        sessionMap["____" + cookie.Name] = cookie.Value
+                    }
+                }
+            }
+
             // if action specifies response action, parse using regexp/jsonpath
             processResult(httpAction, sessionMap, responseBody)
 
@@ -91,7 +109,25 @@ func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http
     if err != nil {
         log.Fatal(err)
     }
+
+    // Add headers
     req.Header.Add("Accept", httpAction.Accept)
+    if (httpAction.ContentType != "") {
+        req.Header.Add("Content-Type", httpAction.ContentType)
+    }
+
+    // Add cookies stored by subsequent requests in the sessionMap having the kludgy ____ prefix
+    for key, value := range sessionMap {
+        if strings.HasPrefix(key, "____") {
+
+            cookie := http.Cookie{
+                Name: key[4:len(key)],
+                Value: value,
+            }
+
+            req.AddCookie(&cookie)
+        }
+    }
 
     return req
 }
@@ -160,7 +196,7 @@ func processResult(httpAction HttpAction, sessionMap map[string]string, response
         }
     }
 
-    //log.Println(string(responseBody))
+    // log.Println(string(responseBody))
 }
 
 /**

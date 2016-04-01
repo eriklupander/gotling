@@ -33,8 +33,10 @@ type HttpAction struct {
     Body            string              `yaml:"body"`
     Template        string              `yaml:"template"`
     Accept          string              `yaml:"accept"`
+    ContentType     string              `yaml:"contentType"`
     Title           string              `yaml:"title"`
     ResponseHandler HttpResponseHandler `yaml:"response"`
+    StoreCookie     string              `yaml:"storeCookie"`
 }
 
 func (h HttpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
@@ -114,14 +116,27 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
         accept = a["accept"].(string)
     }
 
+    var contentType string
+    if a["contentType"] != nil && len(a["contentType"].(string)) > 0 {
+        contentType = a["contentType"].(string)
+    }
+
+    var storeCookie string
+    if a["storeCookie"] != nil && a["storeCookie"].(string) != "" {
+        storeCookie = a["storeCookie"].(string)
+    }
+
     httpAction := HttpAction{
         a["method"].(string),
         a["url"].(string),
         getBody(a),
         getTemplate(a),
         accept,
+        contentType,
         a["title"].(string),
-        responseHandler}
+        responseHandler,
+        storeCookie,
+    }
 
     return httpAction
 }
