@@ -11,6 +11,7 @@ _Please note that this is my very first golang program and is probably full of a
     - Live metrics using HTML5 canvas from canvasjs
     - Request URLs and bodies can contain ${paramName} parameters
     - ${paramName} values can be extracted from HTTP response bodies and bound to a User context
+    - Capturing Set-Cookie response headers
     - POST data can be inlined or read from template files
 - TCP sockets
     - Can send line-terminated text strings
@@ -144,6 +145,21 @@ These values can be accessed through ${varname} matching the column header.
 #### The UID
 Each "user" gets a unique "UID" assigned to it, typically an integer from 10000 + random(no of users). Perhaps I can tweak this to either use UUID's or configurable intervals. Anyway, the UID can be used using ${UID} and can be useful for grouping data etc.
 
+### Capturing cookies
+It's quite common that you need to load-test a secured API. Gotling provides a mechanism that allows you to capture Set-Cookie response headers which then will be automatically applied to subsequent HTTP actions for the current user.
+
+Here is an example where a form-based login POST is used for logging in and storing the returned JSESSIONID cookie
+
+    - http:
+      title: Login
+      method: POST
+      url: https://some.host.name/login
+      body: 'put your urlencoded form data here'
+      accept: '*/*'
+      contentType: application/x-www-form-urlencoded
+      storeCookie: JSESSIONID
+
+
 ### Variable capture from HTTP response bodies
 It's possible to use jsonpath OR xmlpath to capture variables from HTTP responses (json or xml) and use in subsequent invocations during the ongoing sequence of actions. See ${courseId} in the sample above.
 
@@ -167,6 +183,11 @@ Please note that a response definition only may contain either a jsonpath OR an 
 For more on xmlpath, see   [xmlpath](https://godoc.org/gopkg.in/xmlpath.v2)
 
 ##### Important note: xmlpath for Go does not support xml namespaces!
+
+### HTTPS support
+Gotling currently supports HTTPS, including hosts using self-signed certificates.
+
+In the future, we'll probably add an option to allow/disallow unsecure https.
 
 ## Realtime dashboard
 Access at http://localhost:8182
