@@ -44,7 +44,9 @@ func buildActionList(t *TestDef) ([]Action, bool) {
 					break
 				case "tcp":
 					action = NewTcpAction(actionMap)
-				break
+				case "udp":
+					action = NewUdpAction(actionMap)
+					break
 				default:
 					valid = false
 					log.Fatal("Unknown action type encountered: " + key)

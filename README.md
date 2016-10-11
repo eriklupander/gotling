@@ -13,7 +13,7 @@ _Please note that this is my very first golang program and is probably full of a
     - ${paramName} values can be extracted from HTTP response bodies and bound to a User context
     - Capturing Set-Cookie response headers
     - POST data can be inlined or read from template files
-- TCP sockets
+- TCP/UDP sockets
     - Can send line-terminated text strings
     - Possible to use ${varname} variables in payload
     - Does not currently support body parsing or variable extraction from data incoming on the TCP socket.
