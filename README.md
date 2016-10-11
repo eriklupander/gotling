@@ -16,10 +16,41 @@ _Please note that this is my very first golang program and is probably full of a
 - TCP/UDP sockets
     - Can send line-terminated text strings
     - Possible to use ${varname} variables in payload
-    - Does not currently support body parsing or variable extraction from data incoming on the TCP socket.
+    - Does not currently support body parsing or variable extraction from data incoming on the TCP/UDP socket.
 
 ## Building
 
+### NEW: Build using gradle
+
+As per 2016-10-11 gotling can be built using gradle and the excellent [gradle-golang plugin](https://github.com/echocat/gradle-golang-plugin). 
+
+You need to install gradle and have the gradle executable on your PATH in order for the steps below to work nicely. Sorry, no bundled gradle wrapper in Gotling yet...
+
+#### 1. Clone the source from github
+    git clone https://github.com/eriklupander/gotling.git
+    
+#### 2. Open a command shell and set GOPATH
+Go into the root project directory, for example
+    
+    cd ~/projects/gotling
+    export GOPATH=~/projects/gotling
+    
+#### 3. Build using gradle
+    cd src/github.com/eriklupander/gotling
+    ./gradle build
+    
+This step will download the Go SDK for your environment, set appropriate ENV variables etc and then build from source. Afterwards, you'll find binaries for OS X, Windows and Linux in
+    
+    > cd $GOPATH/src/github.com/eriklupander/gotling/build/out
+    > ls     
+    gotling-darwin-amd64
+    gotling-linux-amd64
+    gotling-windows-amd64.exe
+
+Note! You still need the samples, data and log folders in the same root directory as your gotling binary when running.
+
+
+### Legacy building below.
 Of course you need the Go SDK, I think I've used version 1.5 or so. These instructions are based on OS X 10.11, but should apply to Windows and Linux too.
 
 #### 1. Clone the source from github
@@ -69,7 +100,17 @@ To run the standard bundled "demo" simulation, use go run like this:
     cd ~/projects/gotling
     go run src/github.com/eriklupander/gotling/*.go samples/demosimulation.yml
     
+it's also possible to run it from the root source directory (if you copy the data/ samples/ and log/ directory there first)
+
+    cd ~/projects/gotlings/rc/github.com/eriklupander/gotling
+    go run *.go samples/demosimulation.yml
+    
 #### 5.2 Run from binary
+If you built goting using gradle, you'll find your binary in $GOPATH/src/github.com/eriklupander/gotling/build/out.
+From the root folder of this project, you can do it like this:
+
+    ./src/github.com/eriklupander/gotling/build/out/gotling-darwin-amd64 samples/demosimulation.yml
+
 If you built gotling using gb, a binary now resides in $PROJECT/bin
 
     bin/gotling samples/demosimulation.yml 
