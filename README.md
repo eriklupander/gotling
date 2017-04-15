@@ -122,7 +122,7 @@ Define your test setup in a .yml file
     iterations: 10          # Number of iterations per user
     users: 10               # Number of users
     rampup: 20              # seconds
-    actions:                # List of actions. Currently supports http, sleep
+    actions:                # List of actions. Currently supports http, tcp, udp, sleep
       - http:
           method: GET                                  # GET, POST, PUT, DELETE
           url: http://localhost:8183/courses           # URL. Can include ${paramName} parameters
