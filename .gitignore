@@ -27,6 +27,5 @@ _testmain.go
 bin
 out
 dist
-gotling
 results
 vendor
