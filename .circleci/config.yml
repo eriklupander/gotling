@@ -34,7 +34,7 @@ jobs: # basic units of work in a run
     - run:
         name: Build application
         command: |
-          make build
+          make release
 
     - save_cache: # Store cache in the /go/pkg directory
         key: go-mod-v1-{{ checksum "go.sum" }}
