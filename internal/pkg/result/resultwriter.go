@@ -21,19 +21,59 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package result
+
 import (
-	"time"
+	"bufio"
+	"encoding/json"
+	"os"
 )
 
-type SleepAction struct {
-	Duration int `yaml:"duration"`
+var w *bufio.Writer
+var f *os.File
+var err error
+
+var opened bool = false
+
+func OpenResultsFile(fileName string) {
+	if !opened {
+		opened = true
+	} else {
+		return
+	}
+	f, err = os.Create(fileName)
+	if err != nil {
+		os.Mkdir("results", 0777)
+		os.Mkdir("results/log", 0777)
+		f, err = os.Create(fileName)
+		if err != nil {
+			panic(err)
+		}
+	}
+	w = bufio.NewWriter(f)
+	_, err = w.WriteString(string("var logdata = '"))
 }
 
-func (s SleepAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
-	time.Sleep(time.Duration(s.Duration) * time.Second)
+func CloseResultsFile() {
+	if opened {
+		_, err = w.WriteString(string("';"))
+		w.Flush()
+		f.Close()
+	}
+	// Do nothing if not opened
 }
 
-func NewSleepAction(a map[interface{}]interface{}) SleepAction {
-	return SleepAction{a["duration"].(int)}
+func writeResult(httpResult *HttpReqResult) {
+	jsonString, err := json.Marshal(httpResult)
+	if err != nil {
+		panic(err)
+	}
+	_, err = w.WriteString(string(jsonString))
+	_, err = w.WriteString("|")
+
+	if err != nil {
+		panic(err)
+	}
+	w.Flush()
+
 }

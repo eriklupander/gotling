@@ -21,13 +21,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package action
 
-type HttpReqResult struct {
-	Type string
-	Latency int64
-	Size int
-	Status int
-	Title string
-	When int64
+import "github.com/eriklupander/gotling/internal/pkg/result"
+
+type UdpAction struct {
+	Address string `yaml:"address"`
+	Payload string `yaml:"payload"`
+	Title   string `yaml:"title"`
 }
+
+func (t UdpAction) Execute(resultsChannel chan result.HttpReqResult, sessionMap map[string]string) {
+	DoUdpRequest(t, resultsChannel, sessionMap)
+}
+
+func NewUdpAction(a map[interface{}]interface{}) UdpAction {
+
+	// TODO validation
+	return UdpAction{
+		a["address"].(string),
+		a["payload"].(string),
+		a["title"].(string),
+	}
+}
+
+/*
+
+ */

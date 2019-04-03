@@ -21,12 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package result
 
 type StatFrame struct {
-	Time int64 `json:"time"`
-    Latency int `json:"latency"`
-	Reqs int `json:"reqs"`
+	Time    int64 `json:"time"`
+	Latency int   `json:"latency"`
+	Reqs    int   `json:"reqs"`
 }
-
-

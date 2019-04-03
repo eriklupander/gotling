@@ -21,27 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package action
 
-type UdpAction struct {
-	Address string `yaml:"address"`
-	Payload string `yaml:"payload"`
-	Title string `yaml:"title"`
+import (
+	"github.com/eriklupander/gotling/internal/pkg/result"
+	"time"
+)
+
+type SleepAction struct {
+	Duration int `yaml:"duration"`
 }
 
-func (t UdpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
-	DoUdpRequest(t, resultsChannel, sessionMap)
+func (s SleepAction) Execute(resultsChannel chan result.HttpReqResult, sessionMap map[string]string) {
+	time.Sleep(time.Duration(s.Duration) * time.Second)
 }
 
-func NewUdpAction(a map[interface{}]interface{}) UdpAction {
-
-	// TODO validation
-	return UdpAction{
-		a["address"].(string),
-		a["payload"].(string),
-		a["title"].(string),
-	}
+func NewSleepAction(a map[interface{}]interface{}) SleepAction {
+	return SleepAction{a["duration"].(int)}
 }
-/*
-
- */

@@ -21,7 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package result
 
-var _ Action = (*HttpAction)(nil)
-var _ Action = (*SleepAction)(nil)
+type HttpReqResult struct {
+	Type    string
+	Latency int64
+	Size    int
+	Status  int
+	Title   string
+	When    int64
+}

@@ -21,15 +21,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package action
+
+import "github.com/eriklupander/gotling/internal/pkg/result"
 
 type TcpAction struct {
 	Address string `yaml:"address"`
 	Payload string `yaml:"payload"`
-	Title string `yaml:"title"`
+	Title   string `yaml:"title"`
 }
 
-func (t TcpAction) Execute(resultsChannel chan HttpReqResult, sessionMap map[string]string) {
+func (t TcpAction) Execute(resultsChannel chan result.HttpReqResult, sessionMap map[string]string) {
 	DoTcpRequest(t, resultsChannel, sessionMap)
 }
 

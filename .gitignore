@@ -26,7 +26,6 @@ _testmain.go
 *.iml
 bin
 out
-pkg
 dist
 gotling
 results

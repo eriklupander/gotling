@@ -21,24 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
-import (
-"regexp"
-"strings"
-	"net/url"
-)
+package testdef
 
-var re = regexp.MustCompile("\\$\\{([a-zA-Z0-9]{0,})\\}")
+const FIRST = "first"
+const LAST = "last"
+const RANDOM = "random"
 
-func SubstParams(sessionMap map[string]string, textData string) string {
-	if strings.ContainsAny(textData, "${") {
-		res := re.FindAllStringSubmatch(textData, -1)
-		for _, v := range res {
-			textData = strings.Replace(textData, "${" + v[1] + "}", url.QueryEscape(sessionMap[v[1]]), 1)
-		}
-		return textData
-	} else {
-		return textData
-	}
-	return textData
+type TestDef struct {
+	Iterations int                      `yaml:"iterations"`
+	Users      int                      `yaml:"users"`
+	Rampup     int                      `yaml:"rampup"`
+	Feeder     Feeder                   `yaml:"feeder"`
+	Actions    []map[string]interface{} `yaml:"actions"`
+}
+
+type Feeder struct {
+	Type     string `yaml:"type"`
+	Filename string `yaml:"filename`
 }

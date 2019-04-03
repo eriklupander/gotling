@@ -21,36 +21,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package action
+
 import (
+	"github.com/eriklupander/gotling/internal/pkg/testdef"
+	"io/ioutil"
 	"log"
-"os"
-"io/ioutil"
+	"os"
 )
 
-func buildActionList(t *TestDef) ([]Action, bool) {
+func BuildActionList(t *testdef.TestDef) ([]Action, bool) {
 	var valid bool = true
 	actions := make([]Action, len(t.Actions), len(t.Actions))
 	for _, element := range t.Actions {
 		for key, value := range element {
 			var action Action
-            actionMap := value.(map[interface{}]interface{})
+			actionMap := value.(map[interface{}]interface{})
 			switch key {
-				case "sleep":
-					action = NewSleepAction(actionMap)
-					break
-				case "http":
-					action = NewHttpAction(actionMap)
-					break
-				case "tcp":
-					action = NewTcpAction(actionMap)
-				case "udp":
-					action = NewUdpAction(actionMap)
-					break
-				default:
-					valid = false
-					log.Fatal("Unknown action type encountered: " + key)
-					break
+			case "sleep":
+				action = NewSleepAction(actionMap)
+				break
+			case "http":
+				action = NewHttpAction(actionMap)
+				break
+			case "tcp":
+				action = NewTcpAction(actionMap)
+			case "udp":
+				action = NewUdpAction(actionMap)
+				break
+			default:
+				valid = false
+				log.Fatal("Unknown action type encountered: " + key)
+				break
 			}
 			if valid {
 				actions = append(actions, action)
@@ -65,7 +67,7 @@ func getBody(action map[interface{}]interface{}) string {
 	if action["body"] != nil {
 		return action["body"].(string)
 	} else {
-		return "";
+		return ""
 	}
 }
 

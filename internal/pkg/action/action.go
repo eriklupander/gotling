@@ -21,22 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-package main
+package action
 
-const FIRST = "first"
-const LAST = "last"
-const RANDOM = "random"
+import "github.com/eriklupander/gotling/internal/pkg/result"
 
-
-type TestDef struct {
-	Iterations int `yaml:"iterations"`
-	Users int `yaml:"users"`
-	Rampup int `yaml:"rampup"`
-	Feeder Feeder `yaml:"feeder"`
-	Actions []map[string]interface{} `yaml:"actions"`
-}
-
-type Feeder struct {
-	Type string `yaml:"type"`
-	Filename string `yaml:"filename`
+type Action interface {
+	Execute(resultsChannel chan result.HttpReqResult, sessionMap map[string]string)
 }
