@@ -25,16 +25,16 @@ jobs: # basic units of work in a run
         command: |
           make vet 2>&1 | tee ${TEST_RESULTS}/go-vet.out
 
-    #  CircleCi's Go Docker image includes netcat
-    #  This allows polling the DB port to confirm it is open before proceeding
-
     - run:
         name: Run unit tests
         # Store the results of our tests in the $TEST_RESULTS directory
         command: |
           make test | tee ${TEST_RESULTS}/go-test.out
 
-    - run: make build # pull and build dependencies for the project
+    - run:
+        name: Build application
+        command: |
+          make build
 
     - save_cache: # Store cache in the /go/pkg directory
         key: go-mod-v1-{{ checksum "go.sum" }}
