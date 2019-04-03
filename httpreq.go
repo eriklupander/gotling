@@ -32,7 +32,7 @@ import (
     "time"
     //"fmt"
     "gopkg.in/xmlpath.v2"
-    "github.com/NodePrime/jsonpath"
+    //"github.com/NodePrime/jsonpath"
     "bytes"
     "crypto/tls"
 
@@ -137,37 +137,35 @@ func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http
  * from the responseBody.
  *
  * TODO extract both Jsonpath handling and Xmlpath handling into separate functions, and write tests for them.
- *
- * Uses github.com/NodePrime/jsonpath
  */
 func processResult(httpAction HttpAction, sessionMap map[string]string, responseBody []byte) {
-    if httpAction.ResponseHandler.Jsonpath != "" {
-        paths, err := jsonpath.ParsePaths(httpAction.ResponseHandler.Jsonpath)
-        if err != nil {
-            panic(err)
-        }
-        eval, err := jsonpath.EvalPathsInBytes(responseBody, paths)
-        if err != nil {
-            panic(err)
-        }
-
-        // TODO optimization: Don't reinitialize each time, reuse this somehow.
-        resultsArray := make([]string, 0, 10)
-        for {
-            if result, ok := eval.Next(); ok {
-
-                value := strings.TrimSpace(result.Pretty(false))
-                resultsArray = append(resultsArray, trimChar(value, '"'))
-            } else {
-                break
-            }
-        }
-        if eval.Error != nil {
-            panic(eval.Error)
-        }
-
-        passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
-    }
+    //if httpAction.ResponseHandler.Jsonpath != "" {
+    //    paths, err := jsonpath.ParsePaths(httpAction.ResponseHandler.Jsonpath)
+    //    if err != nil {
+    //        panic(err)
+    //    }
+    //    eval, err := jsonpath.EvalPathsInBytes(responseBody, paths)
+    //    if err != nil {
+    //        panic(err)
+    //    }
+    //
+    //    // TODO optimization: Don't reinitialize each time, reuse this somehow.
+    //    resultsArray := make([]string, 0, 10)
+    //    for {
+    //        if result, ok := eval.Next(); ok {
+    //
+    //            value := strings.TrimSpace(result.Pretty(false))
+    //            resultsArray = append(resultsArray, trimChar(value, '"'))
+    //        } else {
+    //            break
+    //        }
+    //    }
+    //    if eval.Error != nil {
+    //        panic(eval.Error)
+    //    }
+    //
+    //    passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
+    //}
 
 
     if httpAction.ResponseHandler.Xmlpath != "" {

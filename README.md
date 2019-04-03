@@ -72,7 +72,6 @@ Go into the root project directory, for example ~/projects/gotling.
     
 May take a little while, after go get finishes, you should see 
 
-    src/github.com/NodePrime/
     src/github.com/eriklupander/
     src/github.com/gorilla/
     src/github.com/tobyhede/
@@ -235,7 +234,7 @@ Access at http://localhost:8182
 
 Click "connect" to connect to the currently executing test.
 
-![Gotling dashboard](gotling-dashboard.png)
+![Gotling dashboard](docs/gotling-dashboard.png)
 
 ## HTML report
 Work in progress, not functional right now :(
@@ -244,7 +243,6 @@ Work in progress, not functional right now :(
 - github.com/davecheney/profile
 - gopkg.in/yaml.v2
 - gopkg.in/xmlpath.v2
-- NodePrime/jsonpath - https://github.com/NodePrime/jsonpath/blob/master/README.md
 - gorilla/websocket
 - highcharts
 

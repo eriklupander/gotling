@@ -27,3 +27,7 @@ _testmain.go
 bin
 out
 pkg
+dist
+gotling
+results
+vendor

@@ -35,8 +35,8 @@ func aggregatePerSecondHandler(perSecondChannel chan *HttpReqResult) {
 
 	for {
 
-		var totalReq  int = 0
-		var totalLatency int = 0
+		totalReq := 0
+		totalLatency := 0
 		until := time.Now().UnixNano() + 1000000000
 		for time.Now().UnixNano() < until {
 			select {

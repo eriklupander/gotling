@@ -51,7 +51,7 @@ type HttpResponseHandler struct {
 }
 
 func NewHttpAction(a map[interface{}]interface{}) HttpAction {
-    var valid bool = true
+    valid := true
     if a["url"] == "" || a["url"] == nil {
         log.Println("Error: HttpAction must define a URL.")
         valid = false
