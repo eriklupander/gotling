@@ -19,6 +19,11 @@ jobs: # basic units of work in a run
         keys:
         - go-mod-v1-{{ checksum "go.sum" }}
 
+    - run:
+        name: Build application
+        command: |
+          make ci
+
     # Code quality checks
     - run:
         name: Run go vet
@@ -30,11 +35,6 @@ jobs: # basic units of work in a run
         # Store the results of our tests in the $TEST_RESULTS directory
         command: |
           make test | tee ${TEST_RESULTS}/go-test.out
-
-    - run:
-        name: Build application
-        command: |
-          make ci
 
     - save_cache: # Store cache in the /go/pkg directory
         key: go-mod-v1-{{ checksum "go.sum" }}
