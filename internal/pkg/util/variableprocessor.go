@@ -41,5 +41,4 @@ func SubstParams(sessionMap map[string]string, textData string) string {
 	} else {
 		return textData
 	}
-	return textData
 }

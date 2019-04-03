@@ -74,12 +74,12 @@ func DoUdpRequest(udpAction UdpAction, resultsChannel chan result.HttpReqResult,
 
 func buildUdpResult(contentLength int, status int, elapsed int64, title string) result.HttpReqResult {
 	httpReqResult := result.HttpReqResult{
-		"UDP",
-		elapsed,
-		contentLength,
-		status,
-		title,
-		time.Since(runtime.SimulationStart).Nanoseconds(),
+		Type:    "UDP",
+		Latency: elapsed,
+		Size:    contentLength,
+		Status:  status,
+		Title:   title,
+		When:    time.Since(runtime.SimulationStart).Nanoseconds(),
 	}
 	return httpReqResult
 }

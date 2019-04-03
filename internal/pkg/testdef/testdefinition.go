@@ -37,5 +37,5 @@ type TestDef struct {
 
 type Feeder struct {
 	Type     string `yaml:"type"`
-	Filename string `yaml:"filename`
+	Filename string `yaml:"filename"`
 }

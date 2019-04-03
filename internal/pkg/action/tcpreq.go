@@ -66,12 +66,12 @@ func DoTcpRequest(tcpAction TcpAction, resultsChannel chan result.HttpReqResult,
 
 func buildTcpResult(contentLength int, status int, elapsed int64, title string) result.HttpReqResult {
 	httpReqResult := result.HttpReqResult{
-		"TCP",
-		elapsed,
-		contentLength,
-		status,
-		title,
-		time.Since(runtime.SimulationStart).Nanoseconds(),
+		Type:    "TCP",
+		Latency: elapsed,
+		Size:    contentLength,
+		Status:  status,
+		Title:   title,
+		When:    time.Since(runtime.SimulationStart).Nanoseconds(),
 	}
 	return httpReqResult
 }
