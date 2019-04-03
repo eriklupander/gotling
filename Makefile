@@ -5,6 +5,9 @@ build:
 	mkdir -p bin
 	GO111MODULE=on go build -o bin/gotling cmd/gotling/main.go
 
+ci:
+	GO111MODULE=on;go build cmd/gotling/main.go
+
 test:
 	mkdir -p ${TEST_RESULTS}
 	@go test -coverprofile=${TEST_RESULTS}/unittest.out -v $(GOPACKAGES)
