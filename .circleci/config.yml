@@ -22,7 +22,7 @@ jobs: # basic units of work in a run
     - run:
         name: Build application
         command: |
-          make ci
+          pwd;ls -la
 
     # Code quality checks
     - run:
