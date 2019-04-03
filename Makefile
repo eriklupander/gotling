@@ -1,5 +1,6 @@
 build:
-	GO111MODULE=on go build cmd/gotling/main.go
+	mkdir -p bin
+	GO111MODULE=on go build -o bin/gotling cmd/gotling/main.go
 
 fmt:
 	go fmt ./...
