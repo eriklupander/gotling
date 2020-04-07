@@ -24,16 +24,18 @@ SOFTWARE.
 package action
 
 import (
-	"github.com/eriklupander/gotling/internal/pkg/result"
-	"github.com/eriklupander/gotling/internal/pkg/runtime"
-	"github.com/eriklupander/gotling/internal/pkg/testdef"
-	"github.com/eriklupander/gotling/internal/pkg/util"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/eriklupander/gotling/internal/pkg/result"
+	"github.com/eriklupander/gotling/internal/pkg/runtime"
+	"github.com/eriklupander/gotling/internal/pkg/testdef"
+	"github.com/eriklupander/gotling/internal/pkg/util"
+
 	//"fmt"
 	"gopkg.in/xmlpath.v2"
 	//"github.com/NodePrime/jsonpath"
@@ -227,6 +229,7 @@ func passResultIntoSessionMap(resultsArray []string, httpAction HttpAction, sess
 			break
 		case testdef.RANDOM:
 			if resultCount > 1 {
+				rand.Seed(time.Now().UnixNano())
 				sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount-1)]
 			} else {
 				sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
