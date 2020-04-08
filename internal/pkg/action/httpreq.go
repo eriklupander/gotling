@@ -24,21 +24,24 @@ SOFTWARE.
 package action
 
 import (
-	"github.com/eriklupander/gotling/internal/pkg/result"
-	"github.com/eriklupander/gotling/internal/pkg/runtime"
-	"github.com/eriklupander/gotling/internal/pkg/testdef"
-	"github.com/eriklupander/gotling/internal/pkg/util"
+	"bytes"
+	"crypto/tls"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
+	"reflect"
 	"strings"
 	"time"
-	//"fmt"
+
+	"github.com/eriklupander/gotling/internal/pkg/result"
+	"github.com/eriklupander/gotling/internal/pkg/runtime"
+	"github.com/eriklupander/gotling/internal/pkg/testdef"
+	"github.com/eriklupander/gotling/internal/pkg/util"
+	"github.com/oliveagle/jsonpath"
 	"gopkg.in/xmlpath.v2"
-	//"github.com/NodePrime/jsonpath"
-	"bytes"
-	"crypto/tls"
 )
 
 // Accepts a Httpaction and a one-way channel to write the results to.
@@ -141,33 +144,36 @@ func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http
  * TODO extract both Jsonpath handling and Xmlpath handling into separate functions, and write tests for them.
  */
 func processResult(httpAction HttpAction, sessionMap map[string]string, responseBody []byte) {
-	//if httpAction.ResponseHandler.Jsonpath != "" {
-	//    paths, err := jsonpath.ParsePaths(httpAction.ResponseHandler.Jsonpath)
-	//    if err != nil {
-	//        panic(err)
-	//    }
-	//    eval, err := jsonpath.EvalPathsInBytes(responseBody, paths)
-	//    if err != nil {
-	//        panic(err)
-	//    }
-	//
-	//    // TODO optimization: Don't reinitialize each time, reuse this somehow.
-	//    resultsArray := make([]string, 0, 10)
-	//    for {
-	//        if result, ok := eval.Next(); ok {
-	//
-	//            value := strings.TrimSpace(result.Pretty(false))
-	//            resultsArray = append(resultsArray, trimChar(value, '"'))
-	//        } else {
-	//            break
-	//        }
-	//    }
-	//    if eval.Error != nil {
-	//        panic(eval.Error)
-	//    }
-	//
-	//    passResultIntoSessionMap(resultsArray, httpAction, sessionMap)
-	//}
+	if httpAction.ResponseHandler.Jsonpath != "" {
+		jsonPattern, err := jsonpath.Compile(httpAction.ResponseHandler.Jsonpath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var jsonData interface{}
+		json.Unmarshal(responseBody, &jsonData)
+
+		res, err := jsonPattern.Lookup(jsonData)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var resultArray []string
+		v := reflect.ValueOf(res)
+		switch v.Kind() {
+		case reflect.String:
+			resultArray = []string{res.(string)}
+		case reflect.Slice:
+			a := res.([]interface{})
+			resultArray = make([]string, len(a))
+			for idx, val := range a {
+				resultArray[idx] = fmt.Sprintf("%s", val)
+			}
+		default:
+			log.Printf("Unknown type [%T]", reflect.TypeOf(res))
+		}
+		passResultIntoSessionMap(resultArray, httpAction, sessionMap)
+	}
 
 	if httpAction.ResponseHandler.Xmlpath != "" {
 		path := xmlpath.MustCompile(httpAction.ResponseHandler.Xmlpath)
@@ -227,6 +233,7 @@ func passResultIntoSessionMap(resultsArray []string, httpAction HttpAction, sess
 			break
 		case testdef.RANDOM:
 			if resultCount > 1 {
+				rand.Seed(time.Now().UnixNano())
 				sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[rand.Intn(resultCount-1)]
 			} else {
 				sessionMap[httpAction.ResponseHandler.Variable] = resultsArray[0]
