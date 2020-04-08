@@ -7,7 +7,7 @@ Simple golang-based load test application using YAML documents as specification.
 For a more full-blown explanation of what Gotling is about, see my blog post here: http://callistaenterprise.se/blogg/teknik/2015/11/22/gotling/
 
 ### Recent updates
-- UPDATE 2020-04-08: [Leon Stitger](https://github.com/retgits) fixed the JSONPath problem
+- UPDATE 2020-04-08: [Leon Stigter](https://github.com/retgits) fixed the JSONPath problem
 - UPDATE 2019-04-04: I've updated gotling to use Go modules and changed the project structure to follow [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout) better**
 
 ### Disclaimer
