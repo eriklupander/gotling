@@ -24,8 +24,9 @@ SOFTWARE.
 package action
 
 import (
-	"github.com/eriklupander/gotling/internal/pkg/result"
 	"log"
+
+	"github.com/eriklupander/gotling/internal/pkg/result"
 )
 
 type HttpAction struct {
@@ -38,6 +39,7 @@ type HttpAction struct {
 	Title           string              `yaml:"title"`
 	ResponseHandler HttpResponseHandler `yaml:"response"`
 	StoreCookie     string              `yaml:"storeCookie"`
+	Headers         map[string]string   `yaml:"headers"`
 }
 
 func (h HttpAction) Execute(resultsChannel chan result.HttpReqResult, sessionMap map[string]string) {
@@ -137,6 +139,7 @@ func NewHttpAction(a map[interface{}]interface{}) HttpAction {
 		a["title"].(string),
 		responseHandler,
 		storeCookie,
+		getHeaders(a),
 	}
 
 	return httpAction
