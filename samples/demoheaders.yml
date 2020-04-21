@@ -4,7 +4,7 @@ users: 2
 rampup: 3
 actions:
   - http:
-      title: Read google.com
+      title: Post to RequestBin
       method: POST
       url: http://requestbin.net/r/189w13m1
       headers:
