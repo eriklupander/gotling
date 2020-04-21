@@ -6,10 +6,12 @@ Simple golang-based load test application using YAML documents as specification.
 
 For a more full-blown explanation of what Gotling is about, see my blog post here: http://callistaenterprise.se/blogg/teknik/2015/11/22/gotling/
 
-**UPDATE 2019-04-04: I've updated gotling to use Go modules and changed the project structure to follow [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout) better**
-_Please note that this was my very first golang program back in 2015 and it's still (2019) full of anti-patterns and bad use of golang constructs._
+### Recent updates
+- UPDATE 2020-04-08: [Leon Stigter](https://github.com/retgits) fixed the JSONPath problem
+- UPDATE 2019-04-04: I've updated gotling to use Go modules and changed the project structure to follow [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout) better**
 
-**NOTE! The JsonPath support is currently broken since the JsonPath library gotling depended on (JsonPrime) has gone missing.**
+### Disclaimer
+Please note that this was my very first golang program back in 2015 and it's still (2020) probably full of anti-patterns and other nasty stuff. I'm not actively developing Gotling but I'll happily accept sensible PRs!
 
 ## What it does
 - Provides high-throughput load testing of HTTP services
@@ -175,8 +177,8 @@ Click "connect" to connect to the currently executing test.
 
 ![Gotling dashboard](docs/gotling-dashboard.png)
 
-## HTML report
-Work in progress, not functional right now :(
+## HTML reports
+Not functional right now :(
 
 ## Uses the following libraries
 - github.com/davecheney/profile
