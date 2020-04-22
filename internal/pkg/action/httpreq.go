@@ -125,6 +125,14 @@ func buildHttpRequest(httpAction HttpAction, sessionMap map[string]string) *http
 		req.Header.Add(key, value)
 	}
 
+	if hostHeader, found := httpAction.Headers["host"]; found {
+		req.Host = hostHeader
+	}
+
+	if hostHeader, found := httpAction.Headers["Host"]; found {
+		req.Host = hostHeader
+	}
+
 	// Add cookies stored by subsequent requests in the sessionMap having the kludgy ____ prefix
 	for key, value := range sessionMap {
 		if strings.HasPrefix(key, "____") {
