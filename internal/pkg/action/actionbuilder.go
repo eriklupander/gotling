@@ -24,10 +24,11 @@ SOFTWARE.
 package action
 
 import (
-	"github.com/eriklupander/gotling/internal/pkg/testdef"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/eriklupander/gotling/internal/pkg/testdef"
 )
 
 func BuildActionList(t *testdef.TestDef) ([]Action, bool) {
@@ -80,4 +81,15 @@ func getTemplate(action map[interface{}]interface{}) string {
 	} else {
 		return ""
 	}
+}
+
+func getHeaders(action map[interface{}]interface{}) map[string]string {
+	headers := make(map[string]string)
+	if action["headers"] != nil {
+		hm := action["headers"].(map[interface{}]interface{})
+		for key, value := range hm {
+			headers[key.(string)] = value.(string)
+		}
+	}
+	return headers
 }

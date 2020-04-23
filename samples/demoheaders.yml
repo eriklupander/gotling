@@ -1,0 +1,15 @@
+---
+iterations: 3
+users: 2
+rampup: 3
+actions:
+  - http:
+      title: Post to RequestBin
+      method: POST
+      url: http://requestbin.net/r/189w13m1
+      headers:
+        hello: world
+        foo: bar
+      accept: json
+  - sleep:
+      duration: 3

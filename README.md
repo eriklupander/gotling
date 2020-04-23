@@ -88,6 +88,21 @@ Define your test setup in a .yml file
             address: 127.0.0.1:8081                     # TCP socket connection
             payload: |TYPE|1|${UID}|${email}            # Sample data using parameter substitution
 
+### HTTP headers
+Gotling supports adding HTTP headers in the YAML specification:
+
+    - http:
+        title: Some title
+        method: POST
+        headers:
+            foo: bar
+            hello: world
+        url: http://localhost:9183/mypath
+        body: '{"id":100,"name":"Some name","author":"${author}-${someId}","created":"2015-10-23T21:33:38.254+02:00","baseLatitude":45.634353,"baseLongitude":11.3424324}'
+        accept: application/json
+
+To give this a try, create a [RequestBin URL](http://requestbin.net/) will collect requests made to it and let you inspect them in a human-friendly way and paste that URL in the [demoheaders.yml](./samples/demoheaders.yml) on line 9.
+
 ### HTTP POST bodies
 Gotling supports POST/PUT bodies either directly inlined in the YAML specification, or read from a template file:
 
