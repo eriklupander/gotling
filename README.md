@@ -8,6 +8,7 @@ For a more full-blown explanation of what Gotling is about, see my blog post her
 
 ### Recent updates
 - UPDATE 2020-05-11: The `sleep` actions now also accepts golang `time.Duration` strings, i.e. `500ms` `2s` or `3m` etc. Any pure numbers specified are still treated as whole seconds.
+- UPDATE 2020-04-22: [Leon Stigter](https://github.com/retgits) added support for adding arbitrary HTTP headers
 - UPDATE 2020-04-08: [Leon Stigter](https://github.com/retgits) fixed the JSONPath problem
 - UPDATE 2019-04-04: I've updated gotling to use Go modules and changed the project structure to follow [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout) better**
 
