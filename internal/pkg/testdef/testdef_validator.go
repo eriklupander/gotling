@@ -30,7 +30,7 @@ import (
 // TODO refactor this so it runs before parsing the actions
 
 func ValidateTestDefinition(t *TestDef) bool {
-	var valid bool = true
+	var valid = true
 	if t.Iterations == 0 {
 		log.Println("Iterations not set, must be > 0")
 		valid = false

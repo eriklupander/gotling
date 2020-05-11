@@ -7,6 +7,7 @@ Simple golang-based load test application using YAML documents as specification.
 For a more full-blown explanation of what Gotling is about, see my blog post here: http://callistaenterprise.se/blogg/teknik/2015/11/22/gotling/
 
 ### Recent updates
+- UPDATE 2020-05-11: The `sleep` actions now also accepts golang `time.Duration` strings, i.e. `500ms` `2s` or `3m` etc. Any pure numbers specified are still treated as whole seconds.
 - UPDATE 2020-04-08: [Leon Stigter](https://github.com/retgits) fixed the JSONPath problem
 - UPDATE 2019-04-04: I've updated gotling to use Go modules and changed the project structure to follow [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout) better**
 
@@ -83,7 +84,7 @@ Define your test setup in a .yml file
             variable: author
             index: first
       - sleep:
-            duration: 3
+            duration: 300ms                             # Note sleep using time.Duration format.
       - tcp:
             address: 127.0.0.1:8081                     # TCP socket connection
             payload: |TYPE|1|${UID}|${email}            # Sample data using parameter substitution

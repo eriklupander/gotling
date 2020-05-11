@@ -24,18 +24,34 @@ SOFTWARE.
 package action
 
 import (
+	"fmt"
 	"github.com/eriklupander/gotling/internal/pkg/result"
 	"time"
 )
 
 type SleepAction struct {
-	Duration int `yaml:"duration"`
+	Duration time.Duration `yaml:"duration"`
 }
 
 func (s SleepAction) Execute(resultsChannel chan result.HttpReqResult, sessionMap map[string]string) {
-	time.Sleep(time.Duration(s.Duration) * time.Second)
+	time.Sleep(s.Duration)
 }
 
 func NewSleepAction(a map[interface{}]interface{}) SleepAction {
-	return SleepAction{a["duration"].(int)}
+	switch val := a["duration"].(type) {
+	case int:
+		return SleepAction{Duration: time.Second * time.Duration(val)}
+	case string:
+		dur, err := time.ParseDuration(val)
+		if err != nil {
+			fmt.Printf("Error trying to parse duration '%v' from string representation into Go duration format. Error: %v\n", val, err.Error())
+			panic(err.Error())
+		}
+		return SleepAction{Duration:dur}
+	case time.Duration:
+		return SleepAction{Duration: val}
+	default:
+		fmt.Printf("unsupported Sleep value type. Supported is int or string (golang time.Duration), was %T\n", val)
+		panic("unsupported sleep value")
+	}
 }
