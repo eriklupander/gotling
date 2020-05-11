@@ -1,6 +1,6 @@
 module github.com/eriklupander/gotling
 
-go 1.12
+go 1.13
 
 require (
 	github.com/gorilla/websocket v0.0.0-20160217174351-4935ba31a2ad
