@@ -23,7 +23,9 @@ SOFTWARE.
 */
 package action
 
-import "github.com/eriklupander/gotling/internal/pkg/result"
+import (
+	"github.com/eriklupander/gotling/internal/pkg/result"
+)
 
 type UdpAction struct {
 	Address string `yaml:"address"`
@@ -36,12 +38,22 @@ func (t UdpAction) Execute(resultsChannel chan result.HttpReqResult, sessionMap 
 }
 
 func NewUdpAction(a map[interface{}]interface{}) UdpAction {
-
-	// TODO validation
+	payload, ok := a["payload"].(string)
+	if !ok {
+		return UdpAction{}
+	}
+	address, ok := a["address"].(string)
+	if !ok {
+		return UdpAction{}
+	}
+	title, ok := a["title"].(string)
+	if !ok {
+		return UdpAction{}
+	}
 	return UdpAction{
-		a["address"].(string),
-		a["payload"].(string),
-		a["title"].(string),
+		address,
+		payload,
+		title,
 	}
 }
 
